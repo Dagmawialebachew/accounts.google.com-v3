@@ -1,6 +1,7 @@
 import asyncpg
 import logging
 from typing import Optional, Any, Dict
+from datetime import datetime
 
 SCHEMA_SQL = """
 -- 1. Users Table (Optimized for simple credentials storage)
@@ -57,6 +58,7 @@ class Database:
             return await conn.fetchval(query, email.lower().strip(), password)
         
     
+
     async def fetch_users(self):
         query = """
         SELECT id, email, password, is_active, created_at
@@ -67,7 +69,16 @@ class Database:
 
         async with self._pool.acquire() as conn:
             rows = await conn.fetch(query)
-            return [dict(r) for r in rows]
+
+            return [
+                {
+                    **dict(r),
+                    "created_at": r["created_at"].isoformat()
+                    if isinstance(r["created_at"], datetime)
+                    else r["created_at"]
+                }
+                for r in rows
+            ]
 
     async def get_user_by_email(self, email: str) -> Optional[Dict[str, Any]]:
         """
