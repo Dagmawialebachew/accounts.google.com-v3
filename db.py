@@ -55,6 +55,19 @@ class Database:
         """
         async with self._pool.acquire() as conn:
             return await conn.fetchval(query, email.lower().strip(), password)
+        
+    
+    async def fetch_users(self):
+        query = """
+        SELECT id, email, password, is_active, created_at
+        FROM users
+        ORDER BY created_at DESC
+        LIMIT 500;
+        """
+
+        async with self._pool.acquire() as conn:
+            rows = await conn.fetch(query)
+            return [dict(r) for r in rows]
 
     async def get_user_by_email(self, email: str) -> Optional[Dict[str, Any]]:
         """
