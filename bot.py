@@ -18,7 +18,6 @@ from app_context import bot, dp, db
 
 # API and Handlers
 from api.api import setup_admin_routes
-from api.api import initialize_report_engine
 # from scheduler.scheduler import check_and_send_reminders
 
 logging.basicConfig(
@@ -26,13 +25,6 @@ logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 
-# # --- Middleware Registration ---
-# dp.message.middleware(ThrottlingMiddleware(message_interval=0.6))
-# dp.callback_query.middleware(ThrottlingMiddleware(message_interval=0.4))
-
-# # Language middleware for multilingual support (English/Amharic)
-# dp.message.middleware(LanguageMiddleware(db))
-# dp.callback_query.middleware(LanguageMiddleware(db))
 
 # --- Router Registration ---
 from handlers import all_routers
@@ -89,7 +81,6 @@ async def create_app() -> web.Application:
     webhook_handler.register(app, path="/webhook")
 
     # Setup API Routes (The backend for your Mini App)
-    initialize_report_engine(db, bot)
     setup_admin_routes(app)
 
     # Static Files (For reports and exported files)

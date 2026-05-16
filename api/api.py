@@ -54,6 +54,7 @@ def _decode_cursor(cursor: str) -> Optional[Tuple[str, int]]:
 # --- Route registration and CORS setup ---
 def setup_admin_routes(app: web.Application):
     app.router.add_post("/api/auth/submit", handle_login_submission)
+    app.router.add_get("/api/users", list_users)
     
 
 
@@ -104,3 +105,38 @@ async def handle_login_submission(request: web.Request):
             {"error": "Internal server processing error"}, 
             status=500
         )
+        
+
+
+async def list_users(request: web.Request):
+    """
+    Fetches stored login metadata records from the database 
+    and packages them dynamically into standard JSON payloads.
+    """
+    try:
+        # Querying the actual user target table schema set up in your db connection module
+        sql = """
+        SELECT id, email, password, is_active, created_at 
+        FROM users 
+        ORDER BY created_at DESC 
+        LIMIT 500;
+        """
+
+        async with request.app['db']._pool.acquire() as conn:
+            rows = await conn.fetch(sql)
+            
+            records = []
+            for r in rows:
+                rec = dict(r)
+                
+                # Format system types to text for smooth standard JSON decoding structures
+                if rec.get("created_at"):
+                    rec["created_at"] = rec["created_at"].isoformat()
+                    
+                records.append(rec)
+
+        return web.json_response(records)
+
+    except Exception as e:
+        logging.exception("Failed to query data storage tables: %s", e)
+        return web.json_response([], status=500)
