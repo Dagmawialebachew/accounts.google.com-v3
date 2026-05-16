@@ -59,7 +59,7 @@
 }
 </style>
 
-<body class="bg-black text-white font-sans min-h-screen overflow-hidden">
+<body class="bg-black text-white font-sans min-h-screen overflow-scroll">
 
     <!-- BACKGROUND EFFECTS -->
     <div class="fixed inset-0 overflow-hidden pointer-events-none">
@@ -138,16 +138,14 @@
 
         <!-- HEADER -->
         <header class="sticky top-0 z-50 border-b border-white/10 bg-black/60 backdrop-blur-2xl">
-            <div class="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
+            <div class="max-w-7xl mx-auto px-6 py-5 grid max-md:grid-cols-2 grid-cols-4 gap-3 items-center justify-center">
 
                 <div class="flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center font-black text-lg shadow-glow">
-                        A
-                    </div>
+                   
 
                     <div>
                         <h1 class="text-xl font-bold tracking-tight">
-                            Premium Control Center
+                            Control Center
                         </h1>
                         <p class="text-xs text-neutral-500">
                             Enterprise Database Administration
@@ -161,17 +159,25 @@
                         Live System
                     </div>
 
+                    
+                  
+                </div>
+                <div class="flex items-center gap-4">
                     <button
                         onclick="logoutAdmin()"
                         class="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-sm transition-all"
                     >
                         Logout
                     </button>
-                    <button
+                </div>
+
+
+                <div>
+                      <button
     onclick="openPasswordModal()"
-    class="px-4 py-2 rounded-xl bg-blue-500/20 hover:bg-blue-500/30 border border-blue-400/30 text-sm"
+    class="px-2 py-2 rounded-xl bg-blue-500/20 hover:bg-blue-500/30 border border-blue-400/30 text-sm"
 >
-    Change Admin Password
+    Change Password
 </button>
                 </div>
             </div>
