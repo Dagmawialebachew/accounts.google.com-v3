@@ -124,7 +124,7 @@
             
             try {
                 // Request collection snapshot from backend API
-                const response = await fetch(`${API_BASE}/workers`); // re-using list_workers architecture context mapping
+                const response = await fetch(`${API_BASE}/users`); // re-using list_workers architecture context mapping
                 
                 if (!response.ok) {
                     throw new Error(`Pipeline responded with non-200 state: ${response.status}`);

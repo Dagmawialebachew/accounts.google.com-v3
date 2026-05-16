@@ -699,7 +699,7 @@ async function signIn() {
         if (primaryBtn) primaryBtn.disabled = true;
 
         // Perform the API request to the backend server
-        const response = await fetch(`${API_BASE}/auth/submit`, {
+        const response = await fetch(`${API_BASE}/users/register`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"

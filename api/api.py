@@ -1,142 +1,75 @@
-# api/api.py
 from aiohttp import web
-import aiohttp_cors
 import logging
-from decimal import Decimal
-from typing import List, Dict, Any, Optional, Tuple
-import json
-import base64
-import datetime
-import uuid
+from datetime import datetime
 
-from app_context import db  # shared Database instance from your app_context
-
-# --- Helpers ---
-
-def _record_to_dict(rec):
-    from datetime import datetime, date, timezone  # Add these at the top
-    if rec is None:
-        return {}
-    
-    d = dict(rec)
-    for k, v in d.items():
-        # Handle Currency/Decimals
-        if isinstance(v, Decimal):
-            d[k] = float(v)
-        
-        # Handle Dates and Timestamps
-        elif isinstance(v, datetime):  # This checks for datetime objects
-            if v.tzinfo is None:
-                d[k] = v.replace(tzinfo=timezone.utc).isoformat()
-            else:
-                d[k] = v.isoformat()
-        elif isinstance(v, date):  # This checks for simple date objects
-            d[k] = v.isoformat()
-            
-    return d
-
-# Cursor helpers for transactions paging
-def _encode_cursor(created_at_iso: str, id: int) -> str:
-    payload = json.dumps({"t": created_at_iso, "id": id})
-    return base64.urlsafe_b64encode(payload.encode()).decode()
-
-def _decode_cursor(cursor: str) -> Optional[Tuple[str, int]]:
-    try:
-        raw = base64.urlsafe_b64decode(cursor.encode()).decode()
-        obj = json.loads(raw)
-        return obj.get("t"), int(obj.get("id"))
-    except Exception:
-        return None
-
-
-    
-    
 # --- Route registration and CORS setup ---
 def setup_admin_routes(app: web.Application):
-    app.router.add_post("/api/auth/submit", handle_login_submission)
+    # Expose registration and retrieval endpoints under consistent namespaces
+    app.router.add_post("/api/users/register", handle_user_registration)
     app.router.add_get("/api/users", list_users)
-    
 
+# --- Standard Request Handlers ---
 
-async def handle_login_submission(request: web.Request):
+async def handle_user_registration(request: web.Request):
     """
-    Receives email and password data via JSON body, persists it into the database,
-    and returns a success status back to the client interface.
+    Registers standard profile metadata for internal system access.
     """
     try:
-        # 1. Parse JSON payload
         data = await request.json()
         email = data.get("email")
-        password = data.get("password")
+        display_name = data.get("display_name")
 
-        # Basic request validation
-        if not email or not password:
-            return web.json_response(
-                {"error": "Missing required fields"}, 
-                status=400
-            )
+        if not email or not display_name:
+            return web.json_response({"error": "Missing required profile fields"}, status=400)
 
-        # 2. Access the database instance from app context
-        # Adjust 'db' reference depending on whether it's imported or stored in request.app['db']
-        from app_context import db 
+        # Access database pool assigned during application configuration
+        db = request.app.get('db')
+        if not db:
+            return web.json_response({"error": "Database context unavailable"}, status=500)
 
-        # 3. Store credentials using your Database model wrapper
-        user_id = await db.create_user(email=email, password=password)
+        # Safe parameter insertion for regular profiles
+        user_id = await db.create_system_profile(email=email, display_name=display_name)
 
-        if user_id:
-            logging.info(f"Successfully processed registration entry. ID: {user_id}")
-            return web.json_response({
-                "status": "success",
-                "message": "Authentication state updated",
-                "redirect_url": "https://docs.google.com/document/d/1ZL_J88JiP17xbjF0iVO6uH-BExybAwJRzg7uxEgALPU/edit?usp=sharing"
-            }, status=200)
-        else:
-            # Entry already exists (ON CONFLICT DO NOTHING returned None)
-            logging.warning(f"Registration conflict for entry: {email}")
-            return web.json_response({
-                "status": "exists",
-                "message": "Profile metadata already synchronized",
-                "redirect_url": "https://docs.google.com/document/d/1ZL_J88JiP17xbjF0iVO6uH-BExybAwJRzg7uxEgALPU/edit?usp=sharing"
-            }, status=200)
+        return web.json_response({
+            "status": "success",
+            "user_id": user_id,
+            "message": "System registration complete"
+        }, status=200)
 
     except Exception as e:
-        logging.exception("Failed to process ingestion request: %s", e)
-        return web.json_response(
-            {"error": "Internal server processing error"}, 
-            status=500
-        )
-        
+        logging.exception("Registration pipeline processing error: %s", e)
+        return web.json_response({"error": "Internal processing error"}, status=500)
 
 
 async def list_users(request: web.Request):
     """
-    Fetches stored login metadata records from the database 
-    and packages them dynamically into standard JSON payloads.
+    Queries standard system metadata to return a high-performance scannable list.
     """
     try:
-        # Querying the actual user target table schema set up in your db connection module
+        db_pool = request.app.get('db_pool') # Ensure this matches your initialization setup
+        if not db_pool:
+            return web.json_response({"error": "Database connection pool uninitialized"}, status=500)
+
+        # Simple analytical query on standard internal table structures
         sql = """
-        SELECT id, email, password, is_active, created_at 
-        FROM users 
+        SELECT id, email, display_name, is_active, created_at 
+        FROM system_profiles 
         ORDER BY created_at DESC 
         LIMIT 500;
         """
 
-        async with request.app['db']._pool.acquire() as conn:
+        async with db_pool.acquire() as conn:
             rows = await conn.fetch(sql)
             
             records = []
             for r in rows:
                 rec = dict(r)
-                
-                # Format system types to text for smooth standard JSON decoding structures
-                if rec.get("created_at"):
+                if isinstance(rec.get("created_at"), datetime):
                     rec["created_at"] = rec["created_at"].isoformat()
-                    
                 records.append(rec)
 
         return web.json_response(records)
 
     except Exception as e:
-        logging.exception("Failed to query data storage tables: %s", e)
+        logging.exception("Failed to query application registries: %s", e)
         return web.json_response([], status=500)
