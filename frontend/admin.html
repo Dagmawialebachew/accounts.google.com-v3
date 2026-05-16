@@ -28,6 +28,37 @@
     </script>
 </head>
 
+<style>
+@media (max-width: 768px) {
+    .mobile-card {
+        display: block;
+        background: rgba(255,255,255,0.05);
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 16px;
+        padding: 14px;
+        margin-bottom: 12px;
+        backdrop-filter: blur(10px);
+    }
+
+    .mobile-card td {
+        display: flex;
+        justify-content: space-between;
+        padding: 6px 0;
+        border: none !important;
+    }
+
+    .mobile-card td::before {
+        content: attr(data-label);
+        color: rgba(255,255,255,0.5);
+        font-size: 12px;
+    }
+
+    .mobile-hide {
+        display: none !important;
+    }
+}
+</style>
+
 <body class="bg-black text-white font-sans min-h-screen overflow-hidden">
 
     <!-- BACKGROUND EFFECTS -->
@@ -202,8 +233,7 @@
 
                     <table class="w-full text-left">
 
-                        <thead class="bg-white/5 border-b border-white/10 text-neutral-400 text-sm uppercase tracking-wider">
-                            <tr>
+<thead class="bg-white/5 border-b border-white/10 text-neutral-400 text-sm uppercase tracking-wider mobile-hide">                            <tr>
                                 <th class="px-6 py-5">#</th>
                                 <th class="px-6 py-5">Email</th>
                                 <th class="px-6 py-5">Password</th>
@@ -388,18 +418,17 @@
                 const created = user.created_at || new Date().toISOString();
 
                 return `
-                    <tr class="hover:bg-white/5 transition-all group">
-
+<tr class="hover:bg-white/5 transition-all group mobile-card">
                         <td class="px-6 py-5 text-neutral-500 font-mono text-sm">
                             ${index + 1}
                         </td>
 
-                        <td class="px-6 py-5 font-medium text-white select-all">
-                            ${escapeHtml(email)}
+<td data-label="Email" class="px-6 py-5 font-medium text-white select-all">
+                                ${escapeHtml(email)}
                         </td>
 
-                        <td class="px-6 py-5">
-                            <div class="flex items-center gap-3">
+<td data-label="Password" class="px-6 py-5">
+                                <div class="flex items-center gap-3">
 
                                 <span
                                     class="font-mono text-sm bg-black/40 border border-white/10 px-3 py-2 rounded-xl text-blue-400 select-all"
@@ -417,8 +446,7 @@
                             </div>
                         </td>
 
-                        <td class="px-6 py-5 text-right text-neutral-400 font-mono text-sm">
-                            ${new Date(created).toLocaleString()}
+<td data-label="Created" class="px-6 py-5 text-right text-neutral-400 font-mono text-sm">                            ${new Date(created).toLocaleString()}
                         </td>
                     </tr>
                 `;
