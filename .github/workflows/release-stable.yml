@@ -1,0 +1,16 @@
+name: release
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  stable:
+    uses: darkbasic/shared-config/.github/workflows/release-stable.yml@main
+    with:
+      releaseScript: release
+      nodeVersion: 18
+      appId: ${{ vars.APP_ID }}
+    secrets:
+      npmToken: ${{ secrets.NPM_TOKEN }}
+      privateKey: ${{ secrets.APP_PRIVATE_KEY }}

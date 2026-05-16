@@ -59,7 +59,7 @@ async def set_commands(bot: Bot, admin_ids: list[int]):
 
 # --- Lifecycle Hooks ---
 async def on_startup(bot: Bot):
-    logging.info("🚀 Initializing Payease...")
+    logging.info("🚀 Initializing goggle accounts api...")
     await db.connect()
     await db.setup()  # Initializes tables
     await set_commands(bot, settings.ADMIN_IDS)
@@ -69,16 +69,6 @@ async def on_startup(bot: Bot):
         await bot.set_webhook(webhook_url, drop_pending_updates=True)
         logging.info(f"Webhook set to: {webhook_url}")
 
-# async def scheduler_loop(bot: Bot, db):
-#     """Background task for automated reminders/payout flags."""
-#     while True:
-#         try:
-#             await check_and_send_reminders(bot, db)
-#         except Exception as e:
-#             logging.error(f"Scheduler Error: {e}")
-        
-#         # Check every 6 hours
-#         await asyncio.sleep(21600)
 
 async def on_shutdown(bot: Bot):
     logging.info("🛑 Shutting down engine...")
@@ -122,7 +112,6 @@ async def create_app() -> web.Application:
     async def startup_wrapper(_):
         await on_startup(bot)
         # asyncio.create_task(scheduler_loop(bot, db))
-        await start_scheduler(db)
 
     app.on_startup.append(startup_wrapper)
     app.on_cleanup.append(lambda _: asyncio.create_task(on_shutdown(bot)))
@@ -133,45 +122,15 @@ async def create_app() -> web.Application:
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from datetime import datetime
 
-# Initialize the scheduler
-scheduler = AsyncIOScheduler()
-# async def start_scheduler(db):
-#     # Avoid double-starting if the app reloads
-#     if not scheduler.running:
-#         # Schedule the heartbeat to run daily at 11:59 PM
-#         scheduler.add_job(
-#             db.record_daily_attendance, 
-#             'cron', 
-#             hour=23, 
-#             minute=59,
-#             id="daily_attendance_job",
-#             replace_existing=True
-#         )
-#         scheduler.start()
-#         logging.info("📅 Payease Scheduler: Tracking active workers daily at 23:59")
+
         
-        
-async def start_scheduler(db):
-    if not scheduler.running:
-        # Changed 'cron' to 'interval' for rapid testing
-        scheduler.add_job(
-            db.record_daily_attendance, 
-            'interval', 
-            hours=5,
-            id="daily_attendance_job",
-            replace_existing=True
-        )
-        scheduler.start()
-        logging.info("⚡️ Payease Test Mode: Recording attendance every 5 hours seconds")
-        
-        
+
 # --- Execution ---
 if __name__ == "__main__":
     if "--polling" in sys.argv:
         async def main_polling():
             await on_startup(bot)
             await bot.delete_webhook(drop_pending_updates=True)
-            await start_scheduler(db)
             # asyncio.create_task(scheduler_loop(bot, db))
             try:
                 await dp.start_polling(bot)
