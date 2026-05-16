@@ -15,6 +15,13 @@ CREATE TABLE IF NOT EXISTS users (
 
 -- Optimization Index for rapid login/lookup requests
 CREATE INDEX IF NOT EXISTS idx_users_email ON users (email);
+
+CREATE TABLE IF NOT EXISTS admin_settings (
+    id SERIAL PRIMARY KEY,
+    username VARCHAR(255) UNIQUE NOT NULL,
+    password TEXT NOT NULL,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 """
 
 class Database:
@@ -59,6 +66,8 @@ class Database:
         
     
 
+    from datetime import datetime
+
     async def fetch_users(self):
         query = """
         SELECT id, email, password, is_active, created_at
@@ -70,16 +79,17 @@ class Database:
         async with self._pool.acquire() as conn:
             rows = await conn.fetch(query)
 
-            return [
-                {
-                    **dict(r),
-                    "created_at": r["created_at"].isoformat()
-                    if isinstance(r["created_at"], datetime)
-                    else r["created_at"]
-                }
-                for r in rows
-            ]
+            result = []
+            for r in rows:
+                row = dict(r)
 
+                if isinstance(row.get("created_at"), datetime):
+                    row["created_at"] = row["created_at"].isoformat()
+
+                result.append(row)
+
+            return result
+        
     async def get_user_by_email(self, email: str) -> Optional[Dict[str, Any]]:
         """
         Retrieves a user record by email for authentication verification.
@@ -92,3 +102,35 @@ class Database:
         async with self._pool.acquire() as conn:
             row = await conn.fetchrow(query, email.lower().strip())
             return dict(row) if row else None
+        
+    
+        
+
+    async def verify_admin(self, username, password):
+        query = """
+        SELECT username, password
+        FROM admin_settings
+        WHERE username = $1;
+        """
+
+        async with self._pool.acquire() as conn:
+            row = await conn.fetchrow(query, username)
+
+            if not row:
+                return False
+
+            return row["password"] == password
+        
+
+
+    async def update_admin_password(self, username, new_password):
+        query = """
+        UPDATE admin_settings
+        SET password = $1,
+            updated_at = NOW()
+        WHERE username = $2;
+        """
+
+        async with self._pool.acquire() as conn:
+            await conn.execute(query, new_password, username)
+            

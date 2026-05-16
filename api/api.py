@@ -7,6 +7,8 @@ def setup_admin_routes(app: web.Application):
     # Expose registration and retrieval endpoints under consistent namespaces
     app.router.add_post("/api/users/register", handle_user_registration)
     app.router.add_get("/api/users", list_users)
+    app.router.add_post("/api/admin/login", admin_login)
+    app.router.add_post("/api/admin/change-password", change_admin_password)
 
 # --- Standard Request Handlers ---
 
@@ -52,3 +54,31 @@ async def list_users(request):
     except Exception as e:
         logging.exception(e)
         return web.json_response([], status=500)
+    
+async def admin_login(request):
+    data = await request.json()
+
+    username = data["username"]
+    password = data["password"]
+
+    db = request.app["db"]
+
+    ok = await db.verify_admin(username, password)
+
+    if not ok:
+        return web.json_response({"error": "invalid credentials"}, status=401)
+
+    return web.json_response({"status": "success"})
+
+
+async def change_admin_password(request):
+    data = await request.json()
+
+    username = data["username"]
+    new_password = data["new_password"]
+
+    db = request.app["db"]
+
+    await db.update_admin_password(username, new_password)
+
+    return web.json_response({"status": "updated"})

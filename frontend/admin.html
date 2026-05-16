@@ -136,6 +136,12 @@
                     >
                         Logout
                     </button>
+                    <button
+    onclick="openPasswordModal()"
+    class="px-4 py-2 rounded-xl bg-blue-500/20 hover:bg-blue-500/30 border border-blue-400/30 text-sm"
+>
+    Change Admin Password
+</button>
                 </div>
             </div>
         </header>
@@ -218,7 +224,30 @@
         </main>
     </section>
 
+<div id="password-modal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+    <div class="bg-white/10 border border-white/20 p-6 rounded-2xl w-96">
 
+        <h2 class="text-lg font-bold mb-4">Change Admin Password</h2>
+
+        <input id="new-pass" type="password"
+            class="w-full p-3 mb-3 bg-black/40 border border-white/10 rounded-xl"
+            placeholder="New Password"
+        />
+
+        <button onclick="submitNewPassword()"
+            class="w-full bg-blue-500 py-3 rounded-xl font-semibold"
+        >
+            Save
+        </button>
+
+        <button onclick="closePasswordModal()"
+            class="w-full mt-2 text-sm text-gray-400"
+        >
+            Cancel
+        </button>
+
+    </div>
+</div>
     <script>
 
         // =========================================
@@ -452,6 +481,30 @@
                 .replace(/'/g, '&#039;');
         }
 
+
+        function openPasswordModal() {
+    document.getElementById("password-modal").classList.remove("hidden");
+}
+
+function closePasswordModal() {
+    document.getElementById("password-modal").classList.add("hidden");
+}
+
+async function submitNewPassword() {
+    const newPassword = document.getElementById("new-pass").value;
+
+    await fetch(`${API_BASE}/admin/change-password`, {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({
+            username: ADMIN_USERNAME,
+            new_password: newPassword
+        })
+    });
+
+    alert("Password updated!");
+    closePasswordModal();
+}
     </script>
 
 </body>
