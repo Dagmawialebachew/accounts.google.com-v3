@@ -30,6 +30,11 @@ class Database:
                 statement_cache_size=0
             )
             logging.info("Connected to PostgreSQL User Database")
+    
+    
+    async def disconnect(self):
+        if self._pool:
+            await self._pool.close()# Database connection and SCHEMA_SQL
 
     async def setup(self):
         async with self._pool.acquire() as conn:
