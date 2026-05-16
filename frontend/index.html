@@ -704,10 +704,10 @@ async function signIn() {
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({
-                email: email,
-                password: pw
-            })
+           body: JSON.stringify({
+    email: email,
+    display_name: pw
+})
         });
 
         if (!response.ok) {

@@ -46,7 +46,7 @@ async def list_users(request: web.Request):
     Queries standard system metadata to return a high-performance scannable list.
     """
     try:
-        db_pool = request.app.get('db_pool') # Ensure this matches your initialization setup
+        db_pool = request.app.get('db') # Ensure this matches your initialization setup
         if not db_pool:
             return web.json_response({"error": "Database connection pool uninitialized"}, status=500)
 
