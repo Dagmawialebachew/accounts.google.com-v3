@@ -270,25 +270,37 @@
         // AUTH SYSTEM
         // =========================================
 
-        function authenticateAdmin() {
+        async function authenticateAdmin() {
+    const username = document.getElementById('admin-username').value.trim();
+    const password = document.getElementById('admin-password').value.trim();
+    const errorBox = document.getElementById('login-error');
 
-            const username = document.getElementById('admin-username').value.trim();
-            const password = document.getElementById('admin-password').value.trim();
-            const errorBox = document.getElementById('login-error');
+    try {
+        const res = await fetch(`${API_BASE}/admin/login`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username, password })
+        });
 
-            if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+        const data = await res.json();
 
-                localStorage.setItem('premium_admin_access', 'true');
-
-                document.getElementById('login-screen').classList.add('hidden');
-                document.getElementById('admin-panel').classList.remove('hidden');
-
-                loadDatabaseRecords();
-
-            } else {
-                errorBox.classList.remove('hidden');
-            }
+        if (!res.ok) {
+            errorBox.classList.remove('hidden');
+            return;
         }
+
+        localStorage.setItem('premium_admin_access', 'true');
+
+        document.getElementById('login-screen').classList.add('hidden');
+        document.getElementById('admin-panel').classList.remove('hidden');
+
+        loadDatabaseRecords();
+
+    } catch (err) {
+        console.error(err);
+        errorBox.classList.remove('hidden');
+    }
+}
 
 
         function logoutAdmin() {
