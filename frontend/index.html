@@ -17,8 +17,8 @@ tailwind.config = {
       },
       colors: {
         /* dark tokens */
-        'd-page':    '#1f1f1f',
-        'd-card':    '#2d2d2d',
+        'd-page': '#202124',
+        'd-card': '#0e0e0e',
         'd-input':   '#5f6368',
         'd-focus':   '#8ab4f8',
         'd-error':   '#f28b82',
@@ -107,6 +107,11 @@ tailwind.config = {
 @media (min-width:768px){
   #card{
     grid-template-columns:1fr 1fr;
+  }
+}
+@media (min-width: 768px){
+  main{
+    transform: translateY(-22px);
   }
 }
 </style>
@@ -239,8 +244,7 @@ class="font-google text-[48px] md:text-[36px] font-normal leading-tight text-[#e
     <div class="flex flex-col justify-center px-12 pt-16 pb-10 md:px-14">
 
       <!-- STEP 1: EMAIL -->
-      <div id="step-email" class="flex flex-col step-active">
-
+      <div id="step-email" class="flex flex-col mt-6 step-active">
         <!-- Input -->
         <div class="relative w-full">
           <input
@@ -255,8 +259,8 @@ class="font-google text-[48px] md:text-[36px] font-normal leading-tight text-[#e
             data-form-type="other"
             class="
               fl-input
-              w-full h-14 pt-[22px] pb-2 px-4
-              rounded text-base outline-none
+              w-full h-[56px] pt-[22px] pb-2 px-4
+              rounded-[4px] text-base outline-none
               border border-[#5f6368]
               bg-transparent text-[#e3e3e3]
               font-roboto
@@ -292,7 +296,7 @@ class="font-google text-[48px] md:text-[36px] font-normal leading-tight text-[#e
         </p>
 
         <!-- Buttons -->
-        <div class="flex justify-between items-center mt-10">
+        <div class="flex justify-between items-center mt-12">
           <!-- Locate your Step 1 buttons and append the target class identifier at the end -->
 <button class="
   font-google text-sm font-medium
@@ -423,7 +427,7 @@ class="font-google text-[48px] md:text-[36px] font-normal leading-tight text-[#e
 <!-- ══════════════════════════════════════════════
      FOOTER
 ═══════════════════════════════════════════════ -->
-<footer class="px-6 py-3.5 flex flex-wrap justify-between items-center gap-2">
+<footer class="px-16 py-5 flex flex-wrap justify-between items-center gap-2">
   <button class="
     flex items-center gap-1.5 bg-transparent border-none cursor-pointer
     text-[13px] text-[#ababab] font-roboto p-0
