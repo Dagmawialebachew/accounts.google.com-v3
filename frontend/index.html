@@ -98,6 +98,17 @@ tailwind.config = {
     transition: background-color 9999s ease 9999s, color 9999s ease 9999s;
     -webkit-text-fill-color: inherit !important;
   }
+
+  #card{
+  display:grid;
+  grid-template-columns:1fr;
+}
+
+@media (min-width:768px){
+  #card{
+    grid-template-columns:1fr 1fr;
+  }
+}
 </style>
 </head>
 
