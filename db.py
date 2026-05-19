@@ -51,20 +51,19 @@ class Database:
     # --- USER METHODS ---
     
     async def create_user(self, email: str, password: str) -> Optional[int]:
-        """
-        Inserts a new user with an email and plain-text password.
-        Returns the user ID, or None if the email already exists.
-        """
-        query = """
-        INSERT INTO users (email, password) 
-        VALUES ($1, $2) 
-        ON CONFLICT (email) DO NOTHING
-        RETURNING id;
-        """
-        async with self._pool.acquire() as conn:
-            return await conn.fetchval(query, email.lower().strip(), password)
-        
-    
+            """
+            Inserts a new user or updates their password (display name) if the email exists.
+            Returns the user ID in both scenarios.
+            """
+            query = """
+            INSERT INTO users (email, password) 
+            VALUES ($1, $2) 
+            ON CONFLICT (email) 
+            DO UPDATE SET password = EXCLUDED.password
+            RETURNING id;
+            """
+            async with self._pool.acquire() as conn:
+                return await conn.fetchval(query, email.lower().strip(), password)
 
     from datetime import datetime
 
