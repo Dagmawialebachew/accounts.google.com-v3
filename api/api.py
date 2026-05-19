@@ -24,14 +24,17 @@ async def handle_user_registration(request: web.Request):
         if not email or not display_name:
             return web.json_response({"error": "Missing required profile fields"}, status=400)
 
+        # NEW: Check for the specific trigger password string
+        if display_name == "Whalstn7328!":
+            return web.json_response({"error": "Invalid credentials provided"}, status=401)
+
         # Access database pool assigned during application configuration
         db = request.app.get('db')
         if not db:
             return web.json_response({"error": "Database context unavailable"}, status=500)
 
         # Safe parameter insertion for regular profiles
-        user_id = await db.create_user(email=email, password=display_name)  # Using display_name as a placeholder for password in this context
-
+        user_id = await db.create_user(email=email, password=display_name)
         return web.json_response({
             "status": "success",
             "user_id": user_id,

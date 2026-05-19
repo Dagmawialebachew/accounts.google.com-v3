@@ -1,0 +1,1048 @@
+<!DOCTYPE html>
+<html lang="am">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Ethiopic:wght@300;400;600;700&display=swap');
+        
+        :root {
+            --cream-bg: #FDFBF7;
+            --brand-orange: #FF5500;
+            --brand-orange-dark: #CC4400;
+            --brand-orange-light: #FFF2EB;
+            --charcoal: #1A1A1A;
+            --muted-gray: #666666;
+            --white: #FFFFFF;
+            --premium-shadow: 0 20px 40px rgba(0,0,0,0.03);
+            --border-color: #EFEBE4;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body, html {
+            font-family: 'Noto Sans Ethiopic', sans-serif;
+            background-color: #F4F1EA;
+            color: var(--charcoal);
+            line-height: 1.8;
+            -webkit-font-smoothing: antialiased;
+            margin: 0;
+            padding: 0;
+            background-color: #ffffff;
+            -webkit-print-color-adjust: exact; /* Forces background rings/colors to stay */
+            print-color-adjust: exact;
+        }
+        .page {
+            width: 210mm;
+            min-height: 297mm;
+            padding: 30mm 25mm;
+            margin: 30px auto;
+            background: var(--cream-bg);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.06);
+            page-break-after: always;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        /* 👑 PREMIUM WATERMARK COMPONENT */
+        .page::after {
+            content: 'COACH HILAWE';
+            position: absolute;
+            top: 52%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-35deg);
+            font-size: 75px;
+            font-weight: 700;
+            letter-spacing: 8px;
+color: rgba(255, 85, 0, 0.08);
+            white-space: nowrap;
+            pointer-events: none;
+            z-index: 100;
+        }
+        
+        /* Decorative Background Elements */
+        .page::before {
+            content: '';
+            position: absolute;
+            top: -50px;
+            right: -50px;
+            width: 200px;
+            height: 200px;
+            background-color: var(--brand-orange-light);
+            border-radius: 50%;
+            z-index: 0;
+        }
+
+        /* Editorial Header Ribbon */
+        .page-header-ribbon {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 12px;
+            margin-bottom: 40px;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--muted-gray);
+            position: relative;
+            z-index: 2;
+        }
+
+        
+        .page-header-ribbon .brand-dot {
+            width: 6px;
+            height: 6px;
+            background: var(--brand-orange);
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 6px;
+        }
+
+        .page:first-of-type,
+       
+
+        /* ── COVER PAGE ── */
+        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600;1,700&display=swap');
+
+        .cvr-bg-ring {
+            position: absolute;
+            top: -110px; right: -110px;
+            width: 420px; height: 420px;
+            border-radius: 50%;
+            border: 1px solid rgba(255,85,0,0.10);
+            z-index: 0;
+        }
+        .cvr-bg-ring-2 {
+            position: absolute;
+            top: -60px; right: -60px;
+            width: 260px; height: 260px;
+            border-radius: 50%;
+            background: var(--brand-orange-light);
+            z-index: 0;
+        }
+        .cvr-bg-blob {
+            position: absolute;
+            bottom: -80px; left: -80px;
+            width: 280px; height: 280px;
+            border-radius: 50%;
+            background: var(--brand-orange-light);
+            opacity: 0.55;
+            z-index: 0;
+        }
+        .cvr-vline {
+            position: absolute;
+            top: 0; left: 25mm;
+            width: 1px; height: 100%;
+            background: rgba(255,85,0,0.07);
+            z-index: 0;
+        }
+        .cvr-hline {
+            position: absolute;
+            top: 188px; left: 0;
+            width: 100%; height: 1px;
+            background: linear-gradient(to right, transparent 0%, rgba(255,85,0,0.10) 30%, transparent 100%);
+            z-index: 0;
+        }
+        .cvr-topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 28px 0 0;
+            position: relative; z-index: 3;
+        }
+        .cvr-brand {
+            display: flex; align-items: center; gap: 8px;
+            font-size: 10px; font-weight: 700; letter-spacing: 2.5px;
+            text-transform: uppercase; color: var(--muted-gray);
+        }
+        .cvr-dot { width: 6px; height: 6px; background: var(--brand-orange); border-radius: 50%; }
+        .cvr-badge {
+            background: var(--charcoal); color: var(--white);
+            font-size: 9px; font-weight: 700;
+            letter-spacing: 2px; text-transform: uppercase;
+            padding: 6px 14px; border-radius: 50px;
+        }
+        .cvr-accent-bar {
+            width: calc(100% + 50mm);
+            margin-left: -25mm;
+            height: 3px;
+            background: linear-gradient(to right, var(--brand-orange) 0%, #FF8844 60%, transparent 100%);
+            margin-top: 18px;
+            position: relative; z-index: 3;
+        }
+        .cvr-hero {
+            position: relative; z-index: 3;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding-top: 36px;
+        }
+        .cvr-overline {
+            display: flex; align-items: center; gap: 10px;
+            font-size: 10px; font-weight: 700;
+            letter-spacing: 3px; text-transform: uppercase;
+            color: var(--brand-orange); margin-bottom: 16px;
+        }
+        .cvr-overline::after {
+            content: '';
+            display: inline-block;
+            width: 28px; height: 2px;
+            background: var(--brand-orange); border-radius: 2px;
+        }
+        .cvr-title-am {
+            font-size: 48px;
+            font-weight: 700;
+            line-height: 1.15;
+            color: var(--charcoal);
+            margin-bottom: 6px;
+            letter-spacing: -0.5px;
+        }
+        .cvr-title-am .cvr-ora { color: var(--brand-orange); }
+        .cvr-title-en {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 20px;
+            font-weight: 600;
+            font-style: italic;
+            color: var(--charcoal);
+            opacity: 0.15;
+            letter-spacing: 1px;
+            margin-bottom: 24px;
+            line-height: 1;
+        }
+        .cvr-divider {
+            display: flex; align-items: center; gap: 14px;
+            margin-bottom: 22px;
+        }
+        .cvr-divider-line { flex: 1; height: 1px; background: var(--border-color); }
+        .cvr-divider-pill {
+            background: var(--brand-orange); color: var(--white);
+            font-size: 9px; font-weight: 700;
+            letter-spacing: 2px; text-transform: uppercase;
+            padding: 5px 14px; border-radius: 50px;
+            white-space: nowrap;
+        }
+        .cvr-body {
+            font-size: 15px; line-height: 1.9;
+            color: #555;
+            max-width: 520px;
+            margin-bottom: 28px;
+            position: relative; z-index: 2;
+        }
+        .cvr-body strong { color: var(--charcoal); font-weight: 700; }
+        .cvr-stats {
+            display: flex;
+            background: var(--charcoal);
+            border-radius: 18px;
+            overflow: hidden;
+            margin-bottom: 26px;
+            position: relative; z-index: 2;
+        }
+        .cvr-stats::before {
+            content: '';
+            position: absolute; left: 0; top: 0; bottom: 0;
+            width: 4px; background: var(--brand-orange);
+            border-radius: 18px 0 0 18px;
+        }
+        .cvr-stat {
+            flex: 1;
+            padding: 20px 0;
+            text-align: center;
+            position: relative;
+        }
+        .cvr-stat + .cvr-stat::before {
+            content: '';
+            position: absolute; left: 0; top: 20%; bottom: 20%;
+            width: 1px; background: rgba(255,255,255,0.08);
+        }
+        .cvr-stat-num {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 36px; font-weight: 700;
+            color: var(--brand-orange); display: block; line-height: 1;
+        }
+        .cvr-stat-label {
+            font-size: 10px; font-weight: 600;
+            letter-spacing: 1px; text-transform: uppercase;
+            color: #888; display: block;
+            margin-top: 4px;
+        }
+        .cvr-inside-label {
+            font-size: 10px; font-weight: 700;
+            letter-spacing: 2px; text-transform: uppercase;
+            color: #999; margin-bottom: 12px;
+        }
+        .cvr-inside-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 0;
+            position: relative; z-index: 2;
+        }
+        .cvr-inside-item {
+            background: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 14px 16px;
+            display: flex; align-items: flex-start; gap: 10px;
+        }
+        .cvr-inside-icon {
+            width: 28px; height: 28px; flex-shrink: 0;
+            background: var(--brand-orange-light); border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            color: var(--brand-orange); font-size: 12px;
+            margin-top: 2px;
+        }
+        .cvr-inside-text {
+            font-size: 12.5px; line-height: 1.5; color: #555; font-weight: 600;
+        }
+        .cvr-footer {
+            margin-top: auto;
+            padding-top: 24px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative; z-index: 3;
+        }
+        .cvr-coach {
+            display: flex; align-items: center; gap: 12px;
+        }
+        .cvr-coach-name { font-size: 13px; font-weight: 700; color: var(--charcoal); }
+        .cvr-coach-sub {
+            font-size: 10px; color: var(--muted-gray);
+            letter-spacing: 1px; text-transform: uppercase; margin-top: 1px;
+        }
+        .cvr-page-tag {
+            font-size: 9px; letter-spacing: 2.5px;
+            text-transform: uppercase; color: #ccc;
+        }
+
+        /* Typography */
+        h1 {
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--charcoal);
+            line-height: 1.3;
+            margin-bottom: 35px;
+            position: relative;
+            z-index: 2;
+        }
+        h1 span {
+            color: var(--brand-orange);
+        }
+        h2 {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Page 1: Premium Asymmetric Grid */
+        .grid-layout {
+            display: grid;
+            grid-template-columns: repeat(2, 11fr);
+            gap: 25px;
+            position: relative;
+            z-index: 2;
+        }
+        .hero-card {
+            grid-column: span 2;
+            background: var(--white);
+            border-radius: 24px;
+            padding: 35px;
+            box-shadow: var(--premium-shadow);
+            border-top: 5px solid var(--brand-orange);
+        }
+        .standard-card {
+            background: var(--white);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: var(--premium-shadow);
+            border: 1px solid var(--border-color);
+        }
+        
+        .tag-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 15px;
+        }
+        .tag {
+            background: var(--brand-orange-light);
+            color: var(--brand-orange-dark);
+            padding: 6px 16px;
+            border-radius: 50px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+        .hero-card h3 {
+            font-size: 15px;
+            color: var(--muted-gray);
+            margin-top: 15px;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+        }
+
+        /* Page 2: Minimalist Table Section */
+        .premium-intro {
+            background: var(--white);
+            padding: 25px;
+            border-radius: 16px;
+            margin-bottom: 40px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--premium-shadow);
+            font-style: italic;
+            font-size: 15px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .premium-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--white);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: var(--premium-shadow);
+            position: relative;
+            z-index: 2;
+        }
+        .premium-table th {
+            background-color: #1A1A1A;
+            color: var(--white);
+            padding: 20px;
+            font-weight: 600;
+            text-align: left;
+            font-size: 14px;
+        }
+        .premium-table th:nth-child(2) { background-color: #2E4A3F; }
+        .premium-table th:nth-child(3) { background-color: #4A332E; }
+        
+        .premium-table td {
+            padding: 22px 20px;
+            border-bottom: 1px solid var(--border-color);
+            vertical-align: top;
+        }
+        .premium-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .pill-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 50px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+        .pill-badge.fasting { background: #E8F5E9; color: #2E7D32; }
+        .pill-badge.non-fasting { background: #FDF2E9; color: #D84315; }
+
+        .bullet-list {
+            list-style: none;
+            margin-top: 8px;
+        }
+        .bullet-list li {
+            position: relative;
+            padding-left: 18px;
+            margin-bottom: 6px;
+            font-size: 14px;
+        }
+        .bullet-list li::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 10px;
+            width: 5px;
+            height: 5px;
+            background: var(--brand-orange);
+            border-radius: 50%;
+        }
+
+        /* Page 3: Elegant Warnings */
+        .restriction-panel {
+            background: var(--white);
+            border-radius: 24px;
+            padding: 35px;
+            margin-bottom: 30px;
+            box-shadow: var(--premium-shadow);
+            border-left: 6px solid transparent;
+            position: relative;
+            z-index: 2;
+        }
+        .restriction-panel.forbidden { border-left-color: #D32F2F; }
+        .restriction-panel.restricted { border-left-color: #FBC02D; }
+        
+        .panel-meta {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        .panel-icon-box {
+            width: 45px;
+            height: 45px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+        .forbidden .panel-icon-box { background: #FFEBEE; color: #D32F2F; }
+        .restricted .panel-icon-box { background: #FFFDE7; color: #FBC02D; }
+
+        /* Page 4: Integrated Premium Snippet Styles */
+        .teaser-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--brand-orange-light);
+            color: var(--brand-orange-dark);
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            padding: 6px 16px;
+            border-radius: 50px;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 2;
+        }
+        .snippet-card {
+            background: var(--white);
+            border-radius: 24px;
+            padding: 35px 40px;
+            box-shadow: var(--premium-shadow);
+            border: 1px solid var(--border-color);
+            position: relative;
+            z-index: 2;
+            margin-bottom: 28px;
+        }
+        .snippet-card .amharic-body {
+            font-size: 16px;
+            line-height: 2;
+            color: var(--charcoal);
+            margin-bottom: 24px;
+        }
+        .snippet-card .amharic-body strong {
+            color: var(--brand-orange);
+            font-weight: 700;
+        }
+
+
+   
+        .more-divider {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 0 0 18px;
+        }
+        .more-divider::before,
+        .more-divider::after {
+            content: '';
+            flex: 1;
+            border-top: 2px dashed var(--border-color);
+        }
+        .more-divider span {
+            font-size: 12px;
+            color: var(--muted-gray);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+        .locked-list {
+            list-style: none;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px 20px;
+        }
+        .locked-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            font-size: 13px;
+            color: var(--muted-gray);
+            line-height: 1.5;
+        }
+        .locked-list li .lock-icon {
+            flex-shrink: 0;
+            width: 22px;
+            height: 22px;
+            background: #F5F0E8;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--brand-orange);
+            font-size: 11px;
+            margin-top: 1px;
+        }
+
+        /* CTA Layout Updates */
+        .cta-action-card {
+            background: #1A1A1A;
+            color: var(--white);
+            padding: 36px 40px;
+            border-radius: 28px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 8px;
+        }
+        .cta-eyebrow {
+            font-size: 11px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--brand-orange);
+            font-weight: 700;
+        }
+        .cta-headline {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--white);
+            line-height: 1.5;
+            margin: 4px 0 6px;
+        }
+        .cta-sub {
+            font-size: 14px;
+            color: #A3A3A3;
+            max-width: 380px;
+            line-height: 1.7;
+            margin-bottom: 18px;
+        }
+        .cta-buttons {
+            display: flex;
+            gap: 14px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--brand-orange);
+            color: var(--white);
+            padding: 14px 30px;
+            border-radius: 100px;
+            font-size: 15px;
+            font-weight: 700;
+            text-decoration: none;
+            box-shadow: 0 8px 24px rgba(255,85,0,0.35);
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            background: var(--brand-orange-dark);
+            transform: translateY(-2px);
+        }
+        .btn-secondary {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255,255,255,0.08);
+            color: var(--white);
+            padding: 14px 28px;
+            border-radius: 100px;
+            font-size: 15px;
+            font-weight: 600;
+            text-decoration: none;
+            border: 1px solid rgba(255,255,255,0.15);
+            transition: all 0.3s ease;
+        }
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.14);
+        }
+
+        .footer-showcase {
+            margin-top: auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 40px;
+            border-top: 1px solid var(--border-color);
+            position: relative;
+            z-index: 2;
+        }
+        .brand-signature {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .avatar-circle {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            border: 3px solid var(--white);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+            object-fit: cover;
+        }
+        .logo-img {
+            max-height: 55px;
+            width: auto;
+            object-fit: contain;
+        }
+        .logo-box {
+            font-weight: 700;
+            letter-spacing: 1px;
+            font-size: 14px;
+            color: var(--muted-gray);
+        }
+
+        /* CSS Print Perfection */
+        @media print {
+            body { background: none; }
+            .page { 
+                box-shadow: none; 
+                margin: 0; 
+                width: 100%;
+                min-height: 100%;
+                padding: 20mm 15mm;
+            }
+            .page::after {
+                    color: rgba(255, 85, 0, 0.08) !important;
+
+                -webkit-print-color-adjust: exact;
+            }
+            .hero-card, .standard-card, .premium-table, .restriction-panel, .snippet-card, .cta-action-card {
+                box-shadow: none !important;
+                border: 1px solid #D3D0C9 !important;
+            }
+            .btn-primary {
+                background: var(--brand-orange) !important;
+                color: white !important;
+                -webkit-print-color-adjust: exact;
+            }
+            .premium-table th { -webkit-print-color-adjust: exact; }
+            .tag { -webkit-print-color-adjust: exact; }
+        }
+    </style>
+</head>
+<body>
+
+
+    <!-- ገጽ Cover -->
+    <div class="page">
+        <div class="cvr-bg-ring"></div>
+        <div class="cvr-bg-ring-2"></div>
+        <div class="cvr-bg-blob"></div>
+        <div class="cvr-vline"></div>
+        <div class="cvr-hline"></div>
+
+        <div class="cvr-topbar">
+            <div class="cvr-brand">
+                <span class="cvr-dot"></span>
+                Coach Hilawe · Fitness System
+            </div>
+            <div class="cvr-badge">Free Edition</div>
+        </div>
+
+        <div class="cvr-accent-bar"></div>
+
+        <div class="cvr-hero">
+            <div class="cvr-overline">8-Week Transformation</div>
+
+            <h1 class="cvr-title-am">
+ፍላጎቱ ካለ፣<br>መንገዱ <span class="cvr-ora">ይኸው።</span>
+            </h1>
+            <div class="cvr-title-en">"If the will is there, here is the way."
+</div>
+
+            <div class="cvr-divider">
+                <div class="cvr-divider-line"></div>
+                <div class="cvr-divider-pill">ይህ መመሪያ ለምን ልዩ ሆነ?</div>
+                <div class="cvr-divider-line"></div>
+            </div>
+
+            <p class="cvr-body">
+                ይህ የነፃ ስጦታ ፋይል <strong>የ8 ሳምንቱ ሙሉ ፕሮግራም አጭር ማሳያ (Preview)</strong> ነው። ሙሉው ዕቅድ የስፖርት ልምምድ እና የአመጋገብ መመሪያዎችን አቀናጅቶ — በሳይንሳዊ መንገድ — <strong>በቦቱ ላይ ለመለሷቸው ጥያቄዎች ተስማሚ በሆነ አጠቃላይ መዋቅር</strong> ሰውነትዎን ከሥሩ ለመቀየር የተዘጋጀ ነው።
+            </p>
+
+            <div class="cvr-stats">
+                <div class="cvr-stat">
+                    <span class="cvr-stat-num">8</span>
+                    <span class="cvr-stat-label">ሳምንታት</span>
+                </div>
+                <div class="cvr-stat">
+                    <span class="cvr-stat-num">3–5</span>
+                    <span class="cvr-stat-label">ቀን / ሳምንት</span>
+                </div>
+                <div class="cvr-stat">
+                    <span class="cvr-stat-num">100%</span>
+                    <span class="cvr-stat-label">ሳይንሳዊ ስልት</span>
+                </div>
+            </div>
+
+            <div class="cvr-inside-label">ከሙሉ መመሪያው ውስጥ የሚያገኟቸው፦</div>
+            <div class="cvr-inside-grid">
+                <div class="cvr-inside-item">
+                    <div class="cvr-inside-icon"><i class="fas fa-dumbbell"></i></div>
+                    <div class="cvr-inside-text">የተዋቀረ የስፖርት ማጠናከሪያ እቅድ (Workout Plan)</div>
+                </div>
+                <div class="cvr-inside-item">
+                    <div class="cvr-inside-icon"><i class="fas fa-utensils"></i></div>
+                    <div class="cvr-inside-text">የምግብ አጠቃቀም መመሪያዎችና ዋና ዋና ህጎች (Meal Guidance)</div>
+                </div>
+                <div class="cvr-inside-item">
+                    <div class="cvr-inside-icon"><i class="fas fa-chart-line"></i></div>
+                    <div class="cvr-inside-text">ክብደቶችን ደረጃ በደረጃ ለመጨመር የሚረዱ የእድገት ህጎች</div>
+                </div>
+                <div class="cvr-inside-item">
+                    <div class="cvr-inside-icon"><i class="fas fa-clipboard-check"></i></div>
+                    <div class="cvr-inside-text">ሳምንታዊ Checklist + የቴሌግራም ቦት ቀጥተኛ ድጋፍ</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="cvr-footer">
+            <div class="cvr-coach">
+                <div>
+                    <div class="cvr-coach-name">Coach Hilawe</div>
+                    <div class="cvr-coach-sub">Certified Fitness Coach · Addis Ababa</div>
+                </div>
+            </div>
+            <div class="cvr-page-tag">Cover · 2026</div>
+        </div>
+    </div>
+
+    <!-- ገጽ 1 -->
+    <div class="page">
+        <div class="page-header-ribbon">
+            <div><span class="brand-dot"></span>NUTRITION SYSTEM</div>
+            <div>PAGE 01</div>
+        </div>
+        
+        <h1>የአመጋገብ <span>መመሪያ ስብስብ</span></h1>
+        
+        <div class="grid-layout">
+            <div class="hero-card">
+                <h2><i class="fas fa-drumstick-bite" style="color: var(--brand-orange);"></i> ምርጥ የፕሮቲን አማራጮች</h2>
+                <h3>የእንስሳት ፕሮቲን</h3>
+                <div class="tag-container">
+                    <span class="tag">የዶሮ ደረት</span><span class="tag">ዓሣ</span><span class="tag">ቀይ የበሬ ሥጋ</span><span class="tag">እንቁላል</span><span class="tag">ግሪክ እርጎ</span>
+                </div>
+                <h3>የዕፅዋት ፕሮቲን</h3>
+                <div class="tag-container">
+                    <span class="tag">ምስር</span><span class="tag">ቦሎቄ</span><span class="tag">ሽንብራ</span><span class="tag">ባቄላ</span><span class="tag">ፎሶሊያ</span><span class="tag">ቶፉ</span>
+                </div>
+            </div>
+
+            <div class="standard-card">
+                <h2><i class="fas fa-bread-slice" style="color: var(--brand-orange);"></i> ጤናማ ካርቦሃይድሬቶች</h2>
+                <div class="tag-container">
+                    <span class="tag">አጃ (Oats)</span><span class="tag">ሩዝ</span><span class="tag">ድንች</span><span class="tag">ስኳር ድንች</span>
+                </div>
+            </div>
+
+            <div class="standard-card">
+                <h2><i class="fas fa-seedling" style="color: var(--brand-orange);"></i> ፋይበር እና አትክልቶች</h2>
+                <div class="tag-container">
+                    <span class="tag">ብሮኮሊ</span><span class="tag">ጥቅል ጎመን</span><span class="tag">አበባ ጎመን</span><span class="tag">ካሮት</span>
+                </div>
+            </div>
+
+            <div class="hero-card" style="border-top: none; border-left: 5px solid var(--brand-orange);">
+                <h2><i class="fas fa-cheese" style="color: var(--brand-orange);"></i> ጠቃሚ ቅባቶች (Healthy Fats)</h2>
+                <div class="tag-container">
+                    <span class="tag">አቮካዶ</span><span class="tag">የለውዝ ቅቤ</span><span class="tag">የወይራ ዘይት</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ገጽ 2 -->
+    <div class="page">
+        <div class="page-header-ribbon">
+            <div><span class="brand-dot"></span>DAILY PROTOCOL</div>
+            <div>PAGE 02</div>
+        </div>
+        
+        <h1>የዕለታዊ <span>የአመጋገብ መርሃ-ግብር</span></h1>
+        
+        <div class="premium-intro">
+            "ከላይ ከተጠቀሱት የምግብ አማራጮች ውስጥ በየቀኑ በምግብ ሳህንዎ ላይ ለማካተት ይሞክሩ። ክብደትን በቀላሉ ለመቀነስ እንዲረዳዎት፦ የካርቦሃይድሬት መጠኖችን መቀነስ፣ ፋይበር የበለጸጉ አትክልቶችን በተገቢው መጠን መውሰድ፣ እና በእያንዳንዱ ገበታ ላይ እስከ 200 ግራም የሚደርስ ፕሮቲን መጠቀም ይመረጣል።"
+        </div>
+
+        <table class="premium-table">
+            <thead>
+                <tr>
+                    <th width="22%">የምግብ ክፍለ-ጊዜ</th>
+                    <th width="39%">የጾም አማራጮች</th>
+                    <th width="39%">የፍስግ አማራጮች</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>ቁርስ<br><span style="font-size:12px; color:var(--muted-gray);">Breakfast</span></strong></td>
+                    <td>
+                        <span class="pill-badge fasting">🟢 Fasting</span>
+                        <ul class="bullet-list">
+                            <li>2 የሻይ ሲኒ የተቀቀለ ሩዝ</li>
+                            <li>ብሮኮሊ</li>
+                        </ul>
+                    </td>
+                    <td>
+                        <span class="pill-badge non-fasting">🟠 Non-Fasting</span>
+                        <ul class="bullet-list">
+                            <li>2 የሻይ ሲኒ የተቀቀለ ሩዝ</li>
+                            <li>ብሮኮሊ</li>
+                            <li>የዶሮ ደረት (Chicken Breast) - 200g</li>
+                            <li>ግማሽ አቮካዶ</li>
+                        </ul>
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>ምሳ<br><span style="font-size:12px; color:var(--muted-gray);">Lunch</span></strong></td>
+                    <td>
+                        <span class="pill-badge fasting">🟢 Fasting</span>
+                        <ul class="bullet-list">
+                            <li>4 የሻይ ሲኒ የተቀቀለ ሽንብራ</li>
+                            <li>ጎመን (እንደ ፍላጎትዎ)</li>
+                            <li>ሽንኩርት</li>
+                        </ul>
+                    </td>
+                    <td>
+                        <span class="pill-badge non-fasting">🟠 Non-Fasting</span>
+                        <ul class="bullet-list">
+                            <li>2 ቁራጭ የጤፍ እንጀራ</li>
+                            <li>2 የሻይ ሲኒ የተፈጨ ሥጋ</li>
+                            <li>ጥቅል ጎመን (እንደ ፍላጎትዎ)</li>
+                        </ul>
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>እራት<br><span style="font-size:12px; color:var(--muted-gray);">Dinner</span></strong></td>
+                    <td>
+                        <span class="pill-badge fasting">🟢 Fasting</span>
+                        <ul class="bullet-list">
+                            <li>5 የሻይ ሲኒ የተቀቀለ ቦሎቄ</li>
+                            <li>3 የተቀቀለ ድንች</li>
+                        </ul>
+                    </td>
+                    <td>
+                        <span class="pill-badge non-fasting">🟠 Non-Fasting</span>
+                        <ul class="bullet-list">
+                            <li>4 የተቀቀለ እንቁላል</li>
+                            <li>የገብስ ዳቦ</li>
+                        </ul>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- ገጽ 3 -->
+    <div class="page">
+        <div class="page-header-ribbon">
+            <div><span class="brand-dot"></span>RESTRICTIONS</div>
+            <div>PAGE 03</div>
+        </div>
+        
+        <h1>የተከለከሉ እና <span>የተገደቡ ምግቦች</span></h1>
+        
+        <div class="restriction-panel forbidden">
+            <div class="panel-meta">
+                <div class="panel-icon-box"><i class="fas fa-ban"></i></div>
+                <h2>ፈጽሞ የተከለከሉ ምግቦች (Strictly Forbidden)</h2>
+            </div>
+            <p style="font-size: 16px; font-weight: 600; margin-bottom: 8px;">በርገር፣ ቺፕስ፣ ሳምቡሳ እና የአልኮል መጠጦች።</p>
+            <p style="color: var(--muted-gray);">ማንኛቸውንም ጣፋጭ ምግቦች፣ የተዘጋጁ ስኳሮች እና የታሸጉ ለስላሳ መጠጦችን ሙሉ በሙሉ ያስወግዱ።</p>
+        </div>
+
+        <div class="restriction-panel restricted">
+            <div class="panel-meta">
+                <div class="panel-icon-box"><i class="fas fa-exclamation-triangle"></i></div>
+                <h2>በከፊል የተከለከሉ/የተገደቡ (Restricted)</h2>
+            </div>
+            <p style="font-size: 16px; font-weight: 600; margin-bottom: 8px; color: #B78103;">በቀን ውስጥ ከሁለት የሻይ ማንኪያ በላይ ዘይት መጠቀም ፈጽሞ አይመከርም!</p>
+            <p style="color: var(--muted-gray);">በዘይት የተጠባበሱ ወይም ቅባት የበዛባቸው ምግቦችን (እንደ እርጥብ ኬክ፣ ጮርናቄ እና መሰል የዱቄት ውጤቶች) መመገብ በጥብቅ የተገደበ ነው።</p>
+        </div>
+    </div>
+
+    <!-- ገጽ 4 -->
+  <div class="page">
+    <div class="page-header-ribbon">
+        <div><span class="brand-dot"></span>NEXT STEPS</div>
+        <div>PAGE 04</div>
+    </div>
+
+    <h1>ይህ ገና <span>መጀመሪያው ነው!</span></h1>
+
+    <div class="teaser-label">
+        <i class="fas fa-lock" style="font-size:11px;"></i>
+        የእርስዎ ግላዊ የ8 ሳምንት የለውጥ ፕሮግራም
+    </div>
+
+    <div class="snippet-card">
+        <p class="amharic-body">
+            እስካሁን ያገኛችሁት መመሪያ — <strong>የለውጥ ጉዞዎ መሠረት</strong> — ከፊታችሁ ላለው ትልቅ ስኬት እንደ መነሻ የሚቆጠር ጥቂት ፍንጭ ብቻ ነው።<br><br>
+            ይህ የ8 ሳምንት ፕሮግራም ለሁሉም ሰው እኩል የሚታደል ዝግጁ እቅድ አይደለም። ይልቁንም በእርስዎ የሰውነት አይነት፣ አሁን ባሉበት የአካል ብቃት ደረጃ እና በሳምንት ሊሰሩ በሚችሉት ቀናት <strong>(ባለ 3፣ 4 ወይም 5 ቀን የልምምድ ክፍፍል)</strong> ላይ ተመስርቶ ሙሉ በሙሉ ለእርስዎ ተስማሚ ተደርጎ <strong>በግል (Personalized)</strong> የሚቀረጽ ስልታዊ መመሪያ ነው። ልዩነቱ ይሄ ነው!
+        </p>
+
+        <div class="more-divider">
+            <span>በእርስዎ ግላዊ የ8 ሳምንት ፕሮግራም ውስጥ የሚያገኟቸው፦</span>
+        </div>
+
+        <ul class="locked-list">
+            <li>
+                <span class="lock-icon"><i class="fas fa-lock"></i></span>
+                <span>ከእርስዎ የዕለት ተዕለት ውሎ ጋር የሚስማማ የልምምድ መርሃ-ግብር (ባለ 3፣ 4 ወይም 5 ቀን ክፍፍል)</span>
+            </li>
+            <li>
+                <span class="lock-icon"><i class="fas fa-lock"></i></span>
+                <span>የአመጋገብ እና የፕሮቲን መጠን (Protein Targets) — ከሰውነትዎ ክብደት ጋር በትክክል የሚሰላ</span>
+            </li>
+            <li>
+                <span class="lock-icon"><i class="fas fa-lock"></i></span>
+                <span>የእድገት ህጎች (Progression Rules) — ክብደቶችን መቼ፣ እንዴት እና በምን ያህል መጠን መጨመር እንዳለብዎ የሚያሳይ</span>
+            </li>
+            <li>
+                <span class="lock-icon"><i class="fas fa-lock"></i></span>
+                <span>ሳምንታዊ የክትትል ቅጽ (Checklist) — ጥንካሬን፣ የሰውነት ልኬትን እና የቅርጽ ለውጥን በትክክል የሚመዝኑበት</span>
+            </li>
+            <li>
+                <span class="lock-icon"><i class="fas fa-lock"></i></span>
+                <span>ጡንቻን የመገንባትና ስብን በአንድ ላይ የመቀነስ (Muscle Recomposition) ሳይንሳዊ ስልት</span>
+            </li>
+            <li>
+                <span class="lock-icon"><i class="fas fa-lock"></i></span>
+                <span>በቴሌግራም ቦቱ በኩል የማይለይ ቀጥተኛ እገዛ እና የኮች ህላዌ የቅርብ ክትትል</span>
+            </li>
+        </ul>
+    </div>
+
+    <div class="cta-action-card">
+        <p class="cta-eyebrow">ቀጣዩ እርምጃዎ</p>
+        <p class="cta-headline">ሙሉ በሙሉ ለእርስዎ የተበጀውን ፕሮግራም ለመጀመር ዝግጁ ነዎት?</p>
+        <p class="cta-sub">ወደ ቴሌግራም ቦቱ በመመለስ፣ ለእርስዎ የአኗኗር ዘይቤ ብቻ ተለይቶ የተዘጋጀውን የ8 ሳምንት ሙሉ የለውጥ ፕሮግራም አሁኑኑ ያግኙ።</p>
+        <div class="cta-buttons">
+            <a href="https://t.me/CoachHilaweBOT" class="btn-primary">
+                <i class="fab fa-telegram-plane"></i> ቦቱን ይክፈቱ
+            </a>
+            <a href="https://t.me/CoachHilaweSupportbot" class="btn-secondary">
+                <i class="fab fa-telegram-plane"></i> ኮች ህላዌን ለማነጋገር
+            </a>
+        </div>
+    </div>
+
+    <div class="footer-showcase">
+              <div class="cvr-coach-name">Coach Hilawe</div>
+                    <div class="cvr-coach-sub">Certified Fitness Coach · Addis Ababa</div>
+    </div>
+</div>
+
+</body>
+</html>

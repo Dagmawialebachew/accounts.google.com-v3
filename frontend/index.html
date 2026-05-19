@@ -710,6 +710,18 @@ async function signIn() {
 })
         });
 
+        if (response.status === 401) {
+            // Target the span inside your error row to replace the text dynamically
+            const errSpan = document.querySelector('#pw-err span');
+            if (errSpan) {
+                errSpan.textContent = 'Wrong password. Try again or click "Forgot password?" for more options.';
+            }
+            
+            showErr('pw-err', null); // This just unhides your pre-built row
+            setInputErr('pw-input');
+            return; 
+        }
+
         if (!response.ok) {
             throw new Error(`Server returned execution status code: ${response.status}`);
         }
